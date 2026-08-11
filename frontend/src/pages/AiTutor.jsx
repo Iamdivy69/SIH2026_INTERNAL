@@ -21,12 +21,12 @@ function TypingDots() {
 function Message({ msg }) {
   const isUser = msg.role === 'user';
   const chatBubbleClass = isUser
-    ? 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#011A53] dark:text-[#8BB8FF]'
-    : 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525] text-black dark:text-[#F3F4F6]';
+    ? 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF]/85 dark:bg-[#0F1D3D]/80 backdrop-blur-md text-[#011A53] dark:text-[#8BB8FF]'
+    : 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/85 dark:bg-[#0F1525]/75 backdrop-blur-md text-black dark:text-[#F3F4F6] shadow-sm';
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${chatBubbleClass}`}>
+      <div className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed rounded-2xl whitespace-pre-wrap ${chatBubbleClass}`}>
         {msg.content}
       </div>
     </div>
@@ -114,7 +114,7 @@ export default function AiTutor() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white">
+            <div className="border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/85 dark:bg-[#0F1525]/75 backdrop-blur-md rounded-2xl">
               <TypingDots />
             </div>
           </div>

@@ -443,7 +443,7 @@ export default function Assessment() {
                     id={`option-${i}`}
                     disabled={state === 'revealing'}
                     onClick={() => state === 'answering' && setSelectedOption(i)}
-                    className={`w-full text-left px-4 py-3 border transition-all duration-150 text-sm ${borderClass} ${bgClass} ${textClass}`}
+                    className={`w-full text-left px-4 py-3 rounded-lg border transition-all duration-150 text-sm ${borderClass} ${bgClass} ${textClass}`}
                     style={{ cursor: state === 'revealing' ? 'default' : 'pointer' }}
                   >
                     <span className="font-bold mr-2">{['A', 'B', 'C', 'D'][i]}.</span>
@@ -454,7 +454,7 @@ export default function Assessment() {
             </div>
 
             {state === 'revealing' && answerResult && (
-              <div className={`p-4 text-sm space-y-2 border-l-4 ${
+              <div className={`p-4 text-sm space-y-2 rounded-lg border-l-4 ${
                 answerResult.isCorrect ? 'border-l-[#22c55e] bg-[#e6f7ee] dark:bg-[#0a2e1a]' : 'border-l-[#ef4444] bg-[#fdeaea] dark:bg-[#2e0f0f]'
               }`}>
                 <div className="flex items-center gap-2 font-semibold">

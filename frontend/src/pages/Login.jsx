@@ -62,8 +62,8 @@ export default function Login() {
   return (
     <div className="relative min-h-screen portal-grid-bg text-black dark:text-[#F3F4F6] flex flex-col transition-colors duration-200 overflow-hidden">
       {/* Ambient background glows */}
-      <div className="pointer-events-none fixed -top-24 -right-24 h-96 w-96 rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-3xl" />
-      <div className="pointer-events-none fixed -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-3xl" />
+      <div className="pointer-events-none fixed -top-24 -right-24 h-[440px] w-[440px] rounded-full bg-[#004CE5]/15 dark:bg-[#004CE5]/20 blur-[100px] animate-blob-1" />
+      <div className="pointer-events-none fixed -bottom-24 -left-24 h-[440px] w-[440px] rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-[100px] animate-blob-2" />
 
       <div className="absolute top-4 right-4 z-20">
         <button
@@ -78,7 +78,7 @@ export default function Login() {
       <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[440px] space-y-8">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#004CE5] mb-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#004CE5] mb-2 shadow-md">
               <span className="text-white text-xl font-bold">P</span>
             </div>
             <h1 className="text-[40px] font-extrabold text-black dark:text-[#F3F4F6]">Welcome back</h1>

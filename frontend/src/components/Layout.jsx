@@ -37,16 +37,16 @@ export default function Layout({ children }) {
 
   return (
     <div className="relative min-h-screen portal-grid-bg text-black dark:text-[#F3F4F6] flex flex-col transition-colors duration-200 overflow-x-hidden">
-      {/* Ambient background glows */}
-      <div className="pointer-events-none fixed -top-24 -right-24 h-96 w-96 rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-3xl" />
-      <div className="pointer-events-none fixed top-1/2 -left-32 h-80 w-80 rounded-full bg-[#004CE5]/5 dark:bg-[#004CE5]/10 blur-3xl" />
-      <div className="pointer-events-none fixed -bottom-24 right-1/4 h-80 w-80 rounded-full bg-[#004CE5]/5 dark:bg-[#004CE5]/10 blur-3xl" />
+      {/* Ambient moving background glows */}
+      <div className="pointer-events-none fixed -top-24 -right-24 h-[450px] w-[450px] rounded-full bg-[#004CE5]/15 dark:bg-[#004CE5]/20 blur-[100px] animate-blob-1" />
+      <div className="pointer-events-none fixed top-1/3 -left-32 h-[400px] w-[400px] rounded-full bg-[#0038A8]/10 dark:bg-[#004CE5]/15 blur-[100px] animate-blob-2" />
+      <div className="pointer-events-none fixed -bottom-24 right-1/4 h-[420px] w-[420px] rounded-full bg-[#004CE5]/10 dark:bg-[#0038A8]/15 blur-[100px] animate-blob-3" />
 
       <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#0F1525]/80 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
-              <div className="w-8 h-8 bg-[#004CE5] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#004CE5] flex items-center justify-center shadow-sm">
                 <span className="text-white text-sm font-bold">P</span>
               </div>
               <span className="font-bold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>

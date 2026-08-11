@@ -49,14 +49,19 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
    Reusable Component Classes — NO GRADIENTS, 0px radius, no shadows
    ================================================================ */
 
-/* ---- Card ---- */
+/* ---- Card (Glassmorphism) ---- */
 .card {
-  background-color: #FFFFFF;
-  border: 1px solid #E6F0FF;
-  border-radius: 0px;
-  box-shadow: none;
+  background-color: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(230, 240, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px -2px rgba(0, 76, 229, 0.05);
   padding: 1.5rem;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: all 0.2s ease-in-out;
+}
+.card:hover {
+  border-color: rgba(0, 76, 229, 0.3);
 }
 
 /* ---- Buttons ---- */
@@ -68,14 +73,14 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 0px;
+  border-radius: 8px;
   background-color: #004CE5;
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.875rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, transform 0.1s;
   outline: none;
 }
 .btn-primary:hover  { background-color: #00236E; }
@@ -90,14 +95,14 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 0px;
+  border-radius: 8px;
   background-color: #E6F0FF;
   color: #011A53;
   font-weight: 600;
   font-size: 0.875rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, border-color 0.15s;
   outline: none;
 }
 .btn-secondary:hover  { background-color: #D6E5FF; }
@@ -112,7 +117,7 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  border-radius: 0px;
+  border-radius: 8px;
   background: transparent;
   color: #64748B;
   font-weight: 500;
@@ -123,19 +128,24 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
 }
 .btn-ghost:hover { background-color: #E6F0FF; color: #011A53; }
 
-/* ---- Form input ---- */
+/* ---- Form input (Glassmorphism) ---- */
 .input {
   width: 100%;
   padding: 0.625rem 1rem;
-  border-radius: 0px;
-  border: 1px solid #E6F0FF;
-  background-color: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid rgba(230, 240, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #000000;
   font-size: 0.875rem;
   outline: none;
-  transition: border-color 0.15s, background-color 0.2s, color 0.2s;
+  transition: border-color 0.15s, background-color 0.2s, color 0.2s, box-shadow 0.2s;
 }
-.input:focus { border-color: #004CE5; }
+.input:focus {
+  border-color: #004CE5;
+  box-shadow: 0 0 0 3px rgba(0, 76, 229, 0.12);
+}
 .input::placeholder { color: #9ca3af; }
 
 /* ---- Chips ---- */
@@ -144,7 +154,7 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.625rem;
-  border-radius: 0px;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 500;
 }
@@ -158,10 +168,13 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
 .mastery-bar-track {
   height: 0.5rem;
   width: 100%;
-  border-radius: 0px;
+  border-radius: 9999px;
   background-color: #E6F0FF;
   overflow: hidden;
   transition: background-color 0.2s;
+}
+.mastery-bar-track > div {
+  border-radius: 9999px;
 }
 
 /* ---- Navigation link ---- */
@@ -170,13 +183,13 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   align-items: center;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0px;
+  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 500;
   color: #000000;
   text-decoration: none;
   border-bottom: 2px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
 .nav-link:hover { color: #004CE5; }
 .nav-link.active { color: #011A53; font-weight: 600; border-bottom-color: #004CE5; }
@@ -195,10 +208,18 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
   color: #F3F4F6;
 }
 
-/* ---- Card ---- */
+/* ---- Card (Dark Glassmorphism) ---- */
 .dark .card {
-  background-color: #0F1525;
-  border-color: #1C2A4A;
+  background-color: rgba(15, 21, 37, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(28, 42, 74, 0.8);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+.dark .card:hover {
+  background-color: rgba(15, 21, 37, 0.75);
+  border-color: rgba(0, 76, 229, 0.5);
+  box-shadow: 0 12px 36px 0 rgba(0, 76, 229, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 }
 
 /* ---- Buttons ---- */
@@ -206,33 +227,46 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
 .dark .btn-primary:active { background-color: #3378FF; }
 
 .dark .btn-secondary {
-  background-color: #0F1D3D;
+  background-color: rgba(15, 29, 61, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(28, 42, 74, 0.8);
   color: #8BB8FF;
 }
-.dark .btn-secondary:hover  { background-color: #15244D; }
+.dark .btn-secondary:hover  {
+  background-color: rgba(21, 36, 77, 0.85);
+  border-color: rgba(0, 76, 229, 0.6);
+}
 .dark .btn-secondary:active { background-color: #1B305E; }
 
-.dark .btn-ghost:hover { background-color: #0F1D3D; color: #8BB8FF; }
+.dark .btn-ghost:hover { background-color: rgba(15, 29, 61, 0.7); color: #8BB8FF; }
 
-/* ---- Form input ---- */
+/* ---- Form input (Dark Glassmorphism) ---- */
 .dark .input {
-  background-color: #0F1525;
-  border-color: #1C2A4A;
+  background-color: rgba(15, 21, 37, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(28, 42, 74, 0.8);
   color: #F3F4F6;
 }
-.dark .input:focus { border-color: #004CE5; }
+.dark .input:focus {
+  border-color: #004CE5;
+  box-shadow: 0 0 0 3px rgba(0, 76, 229, 0.25);
+}
 .dark .input::placeholder { color: #64748B; }
 
 /* ---- Chips ---- */
-.dark .chip-red    { background-color: #2e0f0f; color: #f87171; }
-.dark .chip-yellow { background-color: #2e2408; color: #facc15; }
-.dark .chip-green  { background-color: #0a2e1a; color: #4ade80; }
-.dark .chip-blue   { background-color: #0F1D3D; color: #8BB8FF; }
-.dark .chip-brand  { background-color: #0F1D3D; color: #8BB8FF; }
+.dark .chip-red    { background-color: rgba(46, 15, 15, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; }
+.dark .chip-yellow { background-color: rgba(46, 36, 8, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15; }
+.dark .chip-green  { background-color: rgba(10, 46, 26, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; }
+.dark .chip-blue   { background-color: rgba(15, 29, 61, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(28, 42, 74, 0.8); color: #8BB8FF; }
+.dark .chip-brand  { background-color: rgba(15, 29, 61, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(28, 42, 74, 0.8); color: #8BB8FF; }
 
 /* ---- Mastery bar track ---- */
 .dark .mastery-bar-track {
-  background-color: #1C2A4A;
+  background-color: rgba(28, 42, 74, 0.5);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* ---- Navigation link ---- */
@@ -275,4 +309,75 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+/* ================================================================
+   ORGANIC FLOATING BLOB ANIMATIONS
+   ================================================================ */
+
+@keyframes blob-drift-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(80px, 60px, 0) scale(1.15) rotate(45deg);
+  }
+  50% {
+    transform: translate3d(-50px, 120px, 0) scale(0.92) rotate(90deg);
+  }
+  75% {
+    transform: translate3d(-90px, -40px, 0) scale(1.08) rotate(135deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(180deg);
+  }
+}
+
+@keyframes blob-drift-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  30% {
+    transform: translate3d(-100px, -70px, 0) scale(1.18) rotate(-60deg);
+  }
+  60% {
+    transform: translate3d(60px, -90px, 0) scale(0.88) rotate(-120deg);
+  }
+  85% {
+    transform: translate3d(90px, 50px, 0) scale(1.06) rotate(-180deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(-240deg);
+  }
+}
+
+@keyframes blob-drift-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(70px, -80px, 0) scale(0.94);
+  }
+  66% {
+    transform: translate3d(-90px, 60px, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-blob-1 {
+  animation: blob-drift-1 22s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+.animate-blob-2 {
+  animation: blob-drift-2 28s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+.animate-blob-3 {
+  animation: blob-drift-3 24s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
 
