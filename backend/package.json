@@ -1,0 +1,30 @@
+{
+  "name": "parakh-ai-backend",
+  "version": "1.0.0",
+  "description": "PARAKH AI adaptive assessment backend",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed:questions": "node src/scripts/seedQuestions.js",
+    "seed:admin": "node src/scripts/seedAdminAndStudents.js",
+    "seed:bulk": "node src/scripts/bulkGenerateQuestions.js",
+    "warmup": "node src/scripts/warmupLLM.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "groq-sdk": "^1.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.5.0",
+    "mongoose": "^8.4.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

@@ -1,0 +1,104 @@
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+
+const SunIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
+
+const navItems = [
+  { to: '/dashboard',      label: 'Dashboard' },
+  { to: '/assessment',     label: 'Assessment' },
+  { to: '/knowledge',      label: 'Knowledge' },
+  { to: '/learning-path',  label: 'Learning Path' },
+  { to: '/ai-tutor',       label: 'AI Tutor' },
+];
+
+export default function Layout({ children }) {
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-[#070B15] flex flex-col">
+      <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-4">
+            <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
+              <div className="w-8 h-8 bg-[#004CE5] flex items-center justify-center">
+                <span className="text-white text-sm font-bold">P</span>
+              </div>
+              <span className="font-bold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
+            </NavLink>
+
+            {user && (
+              <nav className="hidden md:flex items-center gap-1">
+                {navItems.map(({ to, label }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    className={({ isActive }) =>
+                      `nav-link ${isActive ? 'active' : ''}`
+                    }
+                  >
+                    {label}
+                  </NavLink>
+                ))}
+                {user.role === 'admin' && (
+                  <NavLink
+                    to="/admin"
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    Admin
+                  </NavLink>
+                )}
+              </nav>
+            )}
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                className="btn-ghost p-2"
+              >
+                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+              </button>
+
+              {user && (
+                <>
+                  <div className="hidden sm:flex flex-col items-end">
+                    <span className="text-sm font-medium text-black dark:text-[#F3F4F6] leading-tight">{user.name}</span>
+                    <span className="text-xs text-[#64748B] dark:text-[#94A3B8] capitalize">{user.role}</span>
+                  </div>
+                  <button onClick={handleLogout} className="btn-ghost text-xs px-3 py-1.5">
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
+    </div>
+  );
+}

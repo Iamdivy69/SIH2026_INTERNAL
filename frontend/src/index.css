@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/* ================================================================
+   PARAKH AI — Scaler Academy Design System
+   Flat, square-corner, blue-brand, light + dark mode
+   NO GRADIENTS — solid colors only
+   ================================================================ */
+
+/* ---- Theme tokens ---- */
+@theme {
+  --font-sans: 'Outfit', system-ui, sans-serif;
+
+  --color-brand-blue:     #004CE5;
+  --color-brand-deep:     #011A53;
+  --color-brand-tint:     #E6F0FF;
+  --color-brand-bg:       #FFFFFF;
+  --color-brand-text:     #000000;
+  --color-brand-muted:    #64748B;
+  --color-brand-border:   #E6F0FF;
+
+  --color-mastery-high:   #22c55e;
+  --color-mastery-mid:    #eab308;
+  --color-mastery-low:    #ef4444;
+}
+
+/* ---- Base ---- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-family: 'Outfit', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFFFFF;
+  color: #000000;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+h1 { font-size: 2.5rem;  font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; }
+h3 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
+
+/* ================================================================
+   Reusable Component Classes — NO GRADIENTS, 0px radius, no shadows
+   ================================================================ */
+
+/* ---- Card ---- */
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid #E6F0FF;
+  border-radius: 0px;
+  box-shadow: none;
+  padding: 1.5rem;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* ---- Buttons ---- */
+
+/* Primary — solid #004CE5 */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0px;
+  background-color: #004CE5;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  outline: none;
+}
+.btn-primary:hover  { background-color: #00236E; }
+.btn-primary:active { background-color: #001A4D; }
+.btn-primary:focus-visible { outline: 2px solid #004CE5; outline-offset: 2px; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Secondary — #E6F0FF fill, #011A53 text */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0px;
+  background-color: #E6F0FF;
+  color: #011A53;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  outline: none;
+}
+.btn-secondary:hover  { background-color: #D6E5FF; }
+.btn-secondary:active { background-color: #C5DAFF; }
+.btn-secondary:focus-visible { outline: 2px solid #004CE5; outline-offset: 2px; }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Ghost */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0px;
+  background: transparent;
+  color: #64748B;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { background-color: #E6F0FF; color: #011A53; }
+
+/* ---- Form input ---- */
+.input {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border-radius: 0px;
+  border: 1px solid #E6F0FF;
+  background-color: #FFFFFF;
+  color: #000000;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.2s, color 0.2s;
+}
+.input:focus { border-color: #004CE5; }
+.input::placeholder { color: #9ca3af; }
+
+/* ---- Chips ---- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.chip-red    { background-color: #fdeaea; color: #dc2626; }
+.chip-yellow { background-color: #fef9e7; color: #a16207; }
+.chip-green  { background-color: #e6f7ee; color: #15803d; }
+.chip-blue   { background-color: #E6F0FF; color: #011A53; }
+.chip-brand  { background-color: #E6F0FF; color: #011A53; }
+
+/* ---- Mastery bar track ---- */
+.mastery-bar-track {
+  height: 0.5rem;
+  width: 100%;
+  border-radius: 0px;
+  background-color: #E6F0FF;
+  overflow: hidden;
+  transition: background-color 0.2s;
+}
+
+/* ---- Navigation link ---- */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #000000;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-link:hover { color: #004CE5; }
+.nav-link.active { color: #011A53; font-weight: 600; border-bottom-color: #004CE5; }
+
+/* ================================================================
+   DARK MODE — same blue-brand DNA, inverted surfaces
+   Dark palette: #070B15 bg, #0F1525 cards, #1C2A4A borders
+   ================================================================ */
+
+.dark body {
+  background-color: #070B15;
+  color: #F3F4F6;
+}
+
+.dark h1, .dark h2, .dark h3, .dark h4 {
+  color: #F3F4F6;
+}
+
+/* ---- Card ---- */
+.dark .card {
+  background-color: #0F1525;
+  border-color: #1C2A4A;
+}
+
+/* ---- Buttons ---- */
+.dark .btn-primary:hover  { background-color: #1A66FF; }
+.dark .btn-primary:active { background-color: #3378FF; }
+
+.dark .btn-secondary {
+  background-color: #0F1D3D;
+  color: #8BB8FF;
+}
+.dark .btn-secondary:hover  { background-color: #15244D; }
+.dark .btn-secondary:active { background-color: #1B305E; }
+
+.dark .btn-ghost:hover { background-color: #0F1D3D; color: #8BB8FF; }
+
+/* ---- Form input ---- */
+.dark .input {
+  background-color: #0F1525;
+  border-color: #1C2A4A;
+  color: #F3F4F6;
+}
+.dark .input:focus { border-color: #004CE5; }
+.dark .input::placeholder { color: #64748B; }
+
+/* ---- Chips ---- */
+.dark .chip-red    { background-color: #2e0f0f; color: #f87171; }
+.dark .chip-yellow { background-color: #2e2408; color: #facc15; }
+.dark .chip-green  { background-color: #0a2e1a; color: #4ade80; }
+.dark .chip-blue   { background-color: #0F1D3D; color: #8BB8FF; }
+.dark .chip-brand  { background-color: #0F1D3D; color: #8BB8FF; }
+
+/* ---- Mastery bar track ---- */
+.dark .mastery-bar-track {
+  background-color: #1C2A4A;
+}
+
+/* ---- Navigation link ---- */
+.dark .nav-link {
+  color: #F3F4F6;
+}
+.dark .nav-link:hover { color: #8BB8FF; }
+.dark .nav-link.active { color: #8BB8FF; border-bottom-color: #004CE5; }
