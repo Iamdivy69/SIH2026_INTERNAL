@@ -13,6 +13,7 @@ import Knowledge    from './pages/Knowledge';
 import LearningPath from './pages/LearningPath';
 import AiTutor      from './pages/AiTutor';
 import Admin        from './pages/Admin';
+import Landing      from './pages/Landing';
 
 function App() {
   return (
@@ -59,8 +60,8 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </BrowserRouter>
       </AuthProvider>

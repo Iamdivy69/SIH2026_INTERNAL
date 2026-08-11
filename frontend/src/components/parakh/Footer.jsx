@@ -1,0 +1,153 @@
+import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
+
+const FOOTER_NAV = [
+  {
+    title: "Platform",
+    links: [
+      { label: "Adaptive Engine", href: "#adaptive-engine" },
+      { label: "AI Question Generation", href: "#ai-generation" },
+      { label: "Analytics", href: "#analytics" },
+      { label: "Security", href: "#security" },
+    ],
+  },
+  {
+    title: "Technology",
+    links: [
+      { label: "Architecture", href: "#adaptive-engine" },
+      { label: "Tech Stack", href: "#" },
+      { label: "Psychometric Models", href: "#" },
+      { label: "Integrations", href: "#" },
+    ],
+  },
+  {
+    title: "Security",
+    links: [
+      { label: "Item Security", href: "#security" },
+      { label: "Proctoring", href: "#security" },
+      { label: "Audit Trails", href: "#security" },
+      { label: "Role-Based Access", href: "#security" },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      { label: "Solution Brief", href: "#brochure" },
+      { label: "Documentation", href: "#" },
+      { label: "Case Studies", href: "#" },
+      { label: "AICTE PARAKH", href: "#" },
+    ],
+  },
+  {
+    title: "Contact",
+    links: [
+      { label: "Request Demo", href: "#demo" },
+      { label: "Support", href: "#" },
+      { label: "Partner With Us", href: "#" },
+      { label: "Press", href: "#" },
+    ],
+  },
+];
+
+export function Footer() {
+  return (
+    <footer
+      id="institutions"
+      className="mt-auto bg-[#011A53] text-white text-left"
+    >
+      <div className="container-x px-6 py-14 md:px-10 md:py-16 lg:px-16 mx-auto max-w-7xl">
+        <div className="grid gap-10 lg:grid-cols-12">
+          {/* Brand block */}
+          <div className="lg:col-span-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center bg-[#004CE5]">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5 text-white"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"
+                    fill="currentColor"
+                    opacity="0.9"
+                  />
+                </svg>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-base font-semibold tracking-tight text-white">
+                  PARAKH
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B0C4FF]">
+                  AI Adaptive Assessment
+                </span>
+              </div>
+            </div>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#B0C4FF]">
+              An AICTE-backed national assessment intelligence platform powering
+              the future of engineering education — measuring ability, not memory.
+            </p>
+
+            <ul className="mt-6 space-y-3 text-sm text-[#B0C4FF]">
+              <li className="flex items-center gap-3">
+                <Mail className="h-4 w-4 text-[#004CE5]" />
+                parakh@aicte-india.org
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="h-4 w-4 text-[#004CE5]" />
+                +91 11 2958 1000
+              </li>
+              <li className="flex items-center gap-3">
+                <MapPin className="h-4 w-4 text-[#004CE5]" />
+                AICTE, Nelson Mandela Marg, Vasant Kunj, New Delhi 110 070
+              </li>
+            </ul>
+          </div>
+
+          {/* Nav columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8 lg:grid-cols-5">
+            {FOOTER_NAV.map((col) => (
+              <div key={col.title}>
+                <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-white">
+                  {col.title}
+                </h4>
+                <ul className="mt-4 space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        className="group inline-flex items-center gap-1.5 text-sm text-[#B0C4FF] transition-colors hover:text-white"
+                      >
+                        {link.label}
+                        <ArrowUpRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 md:flex-row md:items-center">
+          <p className="text-xs text-[#B0C4FF]">
+            © {new Date().getFullYear()} PARAKH · AICTE. All rights reserved.
+          </p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#B0C4FF]">
+            <a href="#" className="hover:text-white">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-white">
+              Terms of Use
+            </a>
+            <a href="#" className="hover:text-white">
+              Accessibility
+            </a>
+            <a href="#" className="hover:text-white">
+              Data Protection
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
