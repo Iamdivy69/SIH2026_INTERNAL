@@ -34,17 +34,36 @@ function MasteryDisplay({ value }) {
   );
 }
 
-function BucketCard({ label, count, concepts, borderColor, chipBg }) {
+function BucketCard({ label, count, concepts }) {
+  const configs = {
+    'Strong': {
+      borderClass: 'border-t-[#15803d] dark:border-t-[#4ade80]',
+      textClass: 'text-[#15803d] dark:text-[#4ade80]',
+      chipBgClass: 'bg-[#e6f7ee] dark:bg-[#0a2e1a] text-[#15803d] dark:text-[#4ade80]',
+    },
+    'Developing': {
+      borderClass: 'border-t-[#a16207] dark:border-t-[#facc15]',
+      textClass: 'text-[#a16207] dark:text-[#facc15]',
+      chipBgClass: 'bg-[#fef9e7] dark:bg-[#2e2408] text-[#a16207] dark:text-[#facc15]',
+    },
+    'Needs Attention': {
+      borderClass: 'border-t-[#dc2626] dark:border-t-[#f87171]',
+      textClass: 'text-[#dc2626] dark:text-[#f87171]',
+      chipBgClass: 'bg-[#fdeaea] dark:bg-[#2e0f0f] text-[#dc2626] dark:text-[#f87171]',
+    },
+  };
+
+  const config = configs[label] || configs['Strong'];
+
   return (
-    <div className="card flex-1 space-y-3" style={{ borderTop: `3px solid ${borderColor}` }}>
+    <div className={`card flex-1 space-y-3 border-t-3 ${config.borderClass}`}>
       <div className="flex items-center justify-between">
         <span className="text-sm font-bold text-black dark:text-[#F3F4F6]">{label}</span>
-        <span className="text-2xl font-bold tabular-nums" style={{ color: borderColor }}>{count}</span>
+        <span className={`text-2xl font-bold tabular-nums ${config.textClass}`}>{count}</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {concepts.map(c => (
-          <span key={c.concept} className="text-xs px-2 py-0.5 font-medium"
-            style={{ backgroundColor: chipBg, color: borderColor }}>
+          <span key={c.concept} className={`text-xs px-2 py-0.5 font-medium ${config.chipBgClass}`}>
             {c.concept} {c.mastery}%
           </span>
         ))}
@@ -107,22 +126,16 @@ export default function Results() {
           label="Strong"
           count={strong.length}
           concepts={strong}
-          borderColor="#15803d"
-          chipBg="#e6f7ee"
         />
         <BucketCard
           label="Developing"
           count={developing.length}
           concepts={developing}
-          borderColor="#a16207"
-          chipBg="#fef9e7"
         />
         <BucketCard
           label="Needs Attention"
           count={weak.length}
           concepts={weak}
-          borderColor="#dc2626"
-          chipBg="#fdeaea"
         />
       </div>
 

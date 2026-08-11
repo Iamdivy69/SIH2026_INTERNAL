@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ================================================================
    PARAKH AI — Scaler Academy Design System
    Flat, square-corner, blue-brand, light + dark mode

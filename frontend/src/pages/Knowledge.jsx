@@ -54,7 +54,7 @@ function Sparkline({ data }) {
 function ConceptCard({ conceptData, isExpanded, onToggle }) {
   const { concept, mastery, history, accuracy, attemptCount, averageResponseTime, recentAttempts, trend } = conceptData;
 
-  const color = mastery >= 70 ? '#15803d' : mastery >= 40 ? '#a16207' : '#dc2626';
+  const textColorClass = mastery >= 70 ? 'text-[#15803d] dark:text-[#4ade80]' : mastery >= 40 ? 'text-[#a16207] dark:text-[#facc15]' : 'text-[#dc2626] dark:text-[#f87171]';
   const label = mastery >= 70 ? 'Strong' : mastery >= 40 ? 'Developing' : 'Needs Attention';
   const chipBg = mastery >= 70 ? 'bg-[#e6f7ee] dark:bg-[#0a2e1a]' : mastery >= 40 ? 'bg-[#fef9e7] dark:bg-[#2e2408]' : 'bg-[#fdeaea] dark:bg-[#2e0f0f]';
   const barColor = mastery >= 70 ? 'bg-[#22c55e]' : mastery >= 40 ? 'bg-[#eab308]' : 'bg-[#ef4444]';
@@ -78,12 +78,11 @@ function ConceptCard({ conceptData, isExpanded, onToggle }) {
   }
 
   return (
-    <div className="card space-y-4 transition-all duration-200"
-      style={{ borderColor: isExpanded ? '#004CE5' : '#E6F0FF' }}>
+    <div className={`card space-y-4 transition-all duration-200 ${isExpanded ? 'border-[#004CE5] dark:border-[#004CE5]' : ''}`}>
       <div onClick={onToggle} className="flex items-center justify-between cursor-pointer select-none">
         <div className="flex items-center gap-3">
           <span className="font-bold text-base text-black dark:text-[#F3F4F6]">{concept}</span>
-          <span className={`text-xs px-2 py-0.5 font-medium ${chipBg}`} style={{ color }}>
+          <span className={`text-xs px-2 py-0.5 font-medium ${chipBg} ${textColorClass}`}>
             {label}
           </span>
           <span className={`text-xs px-2 py-0.5 font-medium hidden sm:inline-block ${trendBadge.bg} ${trendBadge.textColor}`}>
@@ -93,7 +92,7 @@ function ConceptCard({ conceptData, isExpanded, onToggle }) {
 
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <span className="font-bold text-lg tabular-nums" style={{ color }}>{mastery}%</span>
+            <span className={`font-bold text-lg tabular-nums ${textColorClass}`}>{mastery}%</span>
             <span className="text-[10px] text-[#64748B] dark:text-[#94A3B8] block uppercase font-medium">Mastery</span>
           </div>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"

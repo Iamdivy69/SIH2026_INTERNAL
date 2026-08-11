@@ -20,16 +20,13 @@ function TypingDots() {
 
 function Message({ msg }) {
   const isUser = msg.role === 'user';
+  const chatBubbleClass = isUser
+    ? 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#011A53] dark:text-[#8BB8FF]'
+    : 'border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525] text-black dark:text-[#F3F4F6]';
+
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div
-        className="max-w-[85%] px-4 py-3 text-sm leading-relaxed"
-        style={{
-          backgroundColor: isUser ? '#E6F0FF' : '#FFFFFF',
-          color: isUser ? '#011A53' : '#000000',
-          border: isUser ? '1px solid #E6F0FF' : '1px solid #E6F0FF',
-          whiteSpace: 'pre-wrap',
-        }}>
+      <div className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${chatBubbleClass}`}>
         {msg.content}
       </div>
     </div>
@@ -103,14 +100,7 @@ export default function AiTutor() {
             <button
               key={p}
               onClick={() => setInput(p)}
-              className="text-xs px-3 py-1.5 border transition-colors duration-150"
-              style={{
-                borderColor: '#E6F0FF',
-                color: '#011A53',
-                backgroundColor: '#E6F0FF',
-              }}
-              onMouseOver={e => { e.currentTarget.style.borderColor = '#004CE5'; e.currentTarget.style.backgroundColor = '#F8FAFF'; }}
-              onMouseOut={e => { e.currentTarget.style.borderColor = '#E6F0FF'; e.currentTarget.style.backgroundColor = '#E6F0FF'; }}
+              className="text-xs px-3 py-1.5 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#011A53] dark:text-[#8BB8FF] hover:border-[#004CE5] dark:hover:border-[#004CE5] hover:bg-[#F8FAFF] dark:hover:bg-[#15244D] hover:text-[#004CE5] dark:hover:text-[#004CE5] transition-all duration-150 cursor-pointer"
             >
               {p}
             </button>

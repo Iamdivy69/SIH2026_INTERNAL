@@ -140,28 +140,29 @@ export default function LearningPath() {
             const mastery = masteryMap[mod.concept] ?? 0;
             const isEven = index % 2 === 0;
 
+            let borderLeftClass = 'border-l-4 border-l-[#E6F0FF] dark:border-l-[#1C2A4A]';
+            let statusChipClass = 'bg-[#f1f5f9] dark:bg-[#1C2A4A] text-[#64748B] dark:text-[#94A3B8]';
+            let thresholdColorClass = mastery >= mod.threshold ? 'text-[#15803d] dark:text-[#4ade80]' : 'text-[#a16207] dark:text-[#facc15]';
+
+            if (status === 'done') {
+              statusChipClass = 'bg-[#e6f7ee] dark:bg-[#0a2e1a] text-[#15803d] dark:text-[#4ade80]';
+            } else if (status === 'current') {
+              borderLeftClass = 'border-l-4 border-l-[#004CE5]';
+              statusChipClass = 'bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#011A53] dark:text-[#8BB8FF]';
+            }
+
             return (
               <div key={mod.id} className={`flex items-center gap-6 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
                 <div className={`flex-1 ${isEven ? 'text-right' : 'text-left'}`}>
                   <div
                     onClick={() => setSelectedMod(mod)}
-                    className="card inline-block text-left cursor-pointer transition-all duration-200 max-w-sm w-full"
-                    style={{
-                      borderLeft: status === 'current' ? '4px solid #004CE5' : '4px solid #E6F0FF',
-                      borderTopColor: '#E6F0FF',
-                      borderRightColor: '#E6F0FF',
-                      borderBottomColor: '#E6F0FF',
-                    }}
+                    className={`card inline-block text-left cursor-pointer transition-all duration-200 max-w-sm w-full ${borderLeftClass}`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="font-bold text-sm text-black dark:text-[#F3F4F6]">
                         {index + 1}. {mod.label}
                       </span>
-                      <span className="text-xs px-2 py-0.5 font-medium shrink-0"
-                        style={{
-                          backgroundColor: status === 'done' ? '#e6f7ee' : status === 'current' ? '#E6F0FF' : '#f1f5f9',
-                          color: status === 'done' ? '#15803d' : status === 'current' ? '#011A53' : '#64748B',
-                        }}>
+                      <span className={`text-xs px-2 py-0.5 font-medium shrink-0 ${statusChipClass}`}>
                         {status === 'done' ? 'Completed' : status === 'current' ? 'Up Next' : 'Locked'}
                       </span>
                     </div>
@@ -173,7 +174,7 @@ export default function LearningPath() {
                     <div className="space-y-1 pt-2 border-t border-[#E6F0FF] dark:border-t-[#1C2A4A]">
                       <div className="flex justify-between text-xs font-medium">
                         <span className="text-[#64748B] dark:text-[#94A3B8]">{mod.concept} Mastery</span>
-                        <span style={{ color: mastery >= mod.threshold ? '#15803d' : '#a16207' }}>
+                        <span className={thresholdColorClass}>
                           {mastery}% / {mod.threshold}%
                         </span>
                       </div>

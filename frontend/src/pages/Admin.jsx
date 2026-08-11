@@ -162,10 +162,10 @@ export default function Admin() {
                 <label className="text-sm font-medium text-black dark:text-[#F3F4F6]">Difficulty</label>
                 <div className="flex gap-3 pt-1">
                   {[
-                    { val: '1', label: 'Easy',   color: '#15803d' },
-                    { val: '2', label: 'Medium', color: '#a16207' },
-                    { val: '3', label: 'Hard',   color: '#dc2626' },
-                  ].map(({ val, label, color }) => (
+                    { val: '1', label: 'Easy',   textColor: 'text-[#15803d] dark:text-[#4ade80]' },
+                    { val: '2', label: 'Medium', textColor: 'text-[#a16207] dark:text-[#facc15]' },
+                    { val: '3', label: 'Hard',   textColor: 'text-[#dc2626] dark:text-[#f87171]' },
+                  ].map(({ val, label, textColor }) => (
                     <label key={val} className="flex items-center gap-1.5 cursor-pointer text-sm">
                       <input
                         type="radio"
@@ -175,7 +175,7 @@ export default function Admin() {
                         onChange={e => setForm(f => ({ ...f, difficulty: e.target.value }))}
                         className="accent-[#004CE5]"
                       />
-                      <span style={{ color }}>{label}</span>
+                      <span className={textColor}>{label}</span>
                     </label>
                   ))}
                 </div>
@@ -222,19 +222,20 @@ export default function Admin() {
                 <p className="text-sm font-medium text-black dark:text-[#F3F4F6]">{result.question.text}</p>
 
                 <div className="space-y-1.5">
-                  {result.question.options.map((opt, i) => (
-                    <div key={i}
-                      className="text-sm px-3 py-2 border"
-                      style={{
-                        backgroundColor: i === result.question.correctAnswer ? '#e6f7ee' : 'transparent',
-                        borderColor: i === result.question.correctAnswer ? '#86efac' : '#E6F0FF',
-                        color: i === result.question.correctAnswer ? '#15803d' : '#000000',
-                      }}>
-                      <span className="font-bold mr-2">{['A', 'B', 'C', 'D'][i]}.</span>
-                      {opt}
-                      {i === result.question.correctAnswer && ' \u2713'}
-                    </div>
-                  ))}
+                  {result.question.options.map((opt, i) => {
+                    const optionBorderClass = i === result.question.correctAnswer ? 'border-[#22c55e]' : 'border-[#E6F0FF] dark:border-[#1C2A4A]';
+                    const optionBgClass = i === result.question.correctAnswer ? 'bg-[#e6f7ee] dark:bg-[#0a2e1a]' : 'bg-transparent';
+                    const optionTextClass = i === result.question.correctAnswer ? 'text-[#15803d] dark:text-[#4ade80]' : 'text-black dark:text-[#F3F4F6]';
+
+                    return (
+                      <div key={i}
+                        className={`text-sm px-3 py-2 border ${optionBorderClass} ${optionBgClass} ${optionTextClass}`}>
+                        <span className="font-bold mr-2">{['A', 'B', 'C', 'D'][i]}.</span>
+                        {opt}
+                        {i === result.question.correctAnswer && ' \u2713'}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div className="text-xs p-3 bg-[#F8FAFF] dark:bg-[#0D1325] text-black dark:text-[#F3F4F6]">

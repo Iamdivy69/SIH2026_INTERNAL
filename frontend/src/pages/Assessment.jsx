@@ -417,20 +417,24 @@ export default function Assessment() {
 
             <div className="space-y-3">
               {question.options.map((opt, i) => {
-                let borderColor = '#E6F0FF';
-                let bgColor = 'transparent';
-                let textColor = '#000000';
+                let borderClass = 'border-[#E6F0FF] dark:border-[#1C2A4A]';
+                let bgClass = 'bg-transparent hover:bg-slate-50 dark:hover:bg-[#121A2E]';
+                let textClass = 'text-black dark:text-[#F3F4F6]';
 
                 if (state === 'revealing' && answerResult) {
                   if (i === answerResult.correctAnswer) {
-                    borderColor = '#22c55e'; bgColor = '#e6f7ee'; textColor = '#15803d';
+                    borderClass = 'border-[#22c55e]'; 
+                    bgClass = 'bg-[#e6f7ee] dark:bg-[#0a2e1a]'; 
+                    textClass = 'text-[#15803d] dark:text-[#4ade80]';
                   } else if (i === selectedOption && !answerResult.isCorrect) {
-                    borderColor = '#ef4444'; bgColor = '#fdeaea'; textColor = '#dc2626';
+                    borderClass = 'border-[#ef4444]'; 
+                    bgClass = 'bg-[#fdeaea] dark:bg-[#2e0f0f]'; 
+                    textClass = 'text-[#dc2626] dark:text-[#f87171]';
                   }
                 } else if (i === selectedOption) {
-                  borderColor = '#004CE5';
-                  bgColor = '#E6F0FF';
-                  textColor = '#011A53';
+                  borderClass = 'border-[#004CE5]';
+                  bgClass = 'bg-[#E6F0FF] dark:bg-[#0F1D3D]';
+                  textClass = 'text-[#011A53] dark:text-[#8BB8FF]';
                 }
 
                 return (
@@ -439,8 +443,8 @@ export default function Assessment() {
                     id={`option-${i}`}
                     disabled={state === 'revealing'}
                     onClick={() => state === 'answering' && setSelectedOption(i)}
-                    className="w-full text-left px-4 py-3 border transition-all duration-150 text-sm"
-                    style={{ borderColor, backgroundColor: bgColor, color: textColor, cursor: state === 'revealing' ? 'default' : 'pointer' }}
+                    className={`w-full text-left px-4 py-3 border transition-all duration-150 text-sm ${borderClass} ${bgClass} ${textClass}`}
+                    style={{ cursor: state === 'revealing' ? 'default' : 'pointer' }}
                   >
                     <span className="font-bold mr-2">{['A', 'B', 'C', 'D'][i]}.</span>
                     {opt}
