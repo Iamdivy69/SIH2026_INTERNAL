@@ -60,8 +60,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#070B15] flex flex-col">
-      <div className="absolute top-4 right-4">
+    <div className="relative min-h-screen portal-grid-bg text-black dark:text-[#F3F4F6] flex flex-col transition-colors duration-200 overflow-hidden">
+      {/* Ambient background glows */}
+      <div className="pointer-events-none fixed -top-24 -right-24 h-96 w-96 rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-3xl" />
+      <div className="pointer-events-none fixed -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#004CE5]/10 dark:bg-[#004CE5]/15 blur-3xl" />
+
+      <div className="absolute top-4 right-4 z-20">
         <button
           onClick={toggleTheme}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -71,7 +75,7 @@ export default function Login() {
         </button>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-16">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[440px] space-y-8">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-12 h-12 bg-[#004CE5] mb-2">

@@ -241,3 +241,38 @@ h4 { font-size: 1rem;    font-weight: 600; line-height: 1.35; }
 }
 .dark .nav-link:hover { color: #8BB8FF; }
 .dark .nav-link.active { color: #8BB8FF; border-bottom-color: #004CE5; }
+
+/* ================================================================
+   PORTAL BACKGROUND & GRID
+   ================================================================ */
+
+.portal-grid-bg {
+  background-color: #F8FBFF;
+  background-image:
+    linear-gradient(to right, rgba(0, 76, 229, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 76, 229, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.dark .portal-grid-bg {
+  background-color: #070B15;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 76, 229, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 76, 229, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.dark .bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
