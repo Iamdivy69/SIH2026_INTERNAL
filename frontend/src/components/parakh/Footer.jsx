@@ -52,7 +52,7 @@ export function Footer() {
   return (
     <footer
       id="institutions"
-      className="mt-auto bg-[#011A53] text-white text-left"
+      className="mt-auto bg-[#011A53] dark:bg-[#070B15] border-t border-transparent dark:border-[#1C2A4A] text-white text-left transition-colors duration-200"
     >
       <div className="container-x px-6 py-14 md:px-10 md:py-16 lg:px-16 mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-12">
@@ -77,17 +77,17 @@ export function Footer() {
                 <span className="text-base font-semibold tracking-tight text-white">
                   PARAKH
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B0C4FF]">
+                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B0C4FF] dark:text-[#8BB8FF]">
                   AI Adaptive Assessment
                 </span>
               </div>
             </div>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#B0C4FF]">
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#B0C4FF] dark:text-[#94A3B8]">
               An AICTE-backed national assessment intelligence platform powering
               the future of engineering education — measuring ability, not memory.
             </p>
 
-            <ul className="mt-6 space-y-3 text-sm text-[#B0C4FF]">
+            <ul className="mt-6 space-y-3 text-sm text-[#B0C4FF] dark:text-[#CBD5E1]">
               <li className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-[#004CE5]" />
                 parakh@aicte-india.org
@@ -115,7 +115,7 @@ export function Footer() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="group inline-flex items-center gap-1.5 text-sm text-[#B0C4FF] transition-colors hover:text-white"
+                        className="group inline-flex items-center gap-1.5 text-sm text-[#B0C4FF] dark:text-[#94A3B8] transition-colors hover:text-white dark:hover:text-[#8BB8FF]"
                       >
                         {link.label}
                         <ArrowUpRight className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -128,21 +128,21 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 md:flex-row md:items-center">
-          <p className="text-xs text-[#B0C4FF]">
+        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 dark:border-[#1C2A4A] pt-6 md:flex-row md:items-center">
+          <p className="text-xs text-[#B0C4FF] dark:text-[#94A3B8]">
             © {new Date().getFullYear()} PARAKH · AICTE. All rights reserved.
           </p>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#B0C4FF]">
-            <a href="#" className="hover:text-white">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#B0C4FF] dark:text-[#94A3B8]">
+            <a href="#" className="hover:text-white dark:hover:text-[#8BB8FF]">
               Privacy Policy
             </a>
-            <a href="#" className="hover:text-white">
+            <a href="#" className="hover:text-white dark:hover:text-[#8BB8FF]">
               Terms of Use
             </a>
-            <a href="#" className="hover:text-white">
+            <a href="#" className="hover:text-white dark:hover:text-[#8BB8FF]">
               Accessibility
             </a>
-            <a href="#" className="hover:text-white">
+            <a href="#" className="hover:text-white dark:hover:text-[#8BB8FF]">
               Data Protection
             </a>
           </div>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShieldCheck, LogIn } from "lucide-react";
+import { Menu, X, ShieldCheck, LogIn, Sun, Moon } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 
 const NAV_ITEMS = [
   { label: "Platform", href: "#platform" },
@@ -18,6 +19,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -31,11 +33,11 @@ export function Navbar() {
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-colors duration-300",
         scrolled
-          ? "border-[#E6F0FF] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85"
-          : "border-transparent bg-white"
+          ? "border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 dark:supports-[backdrop-filter]:bg-[#0F1525]/85"
+          : "border-transparent bg-white dark:bg-[#070B15]"
       )}
     >
-      <div className="container-x flex h-16 items-center justify-between px-6 md:px-10 lg:px-16">
+      <div className="container-x flex h-16 items-center justify-between px-6 md:px-10 lg:px-16 mx-auto max-w-7xl">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center bg-[#004CE5]">
@@ -53,10 +55,10 @@ export function Navbar() {
             </svg>
           </div>
           <div className="flex flex-col leading-none text-left">
-            <span className="text-base font-semibold tracking-tight text-black">
+            <span className="text-base font-semibold tracking-tight text-black dark:text-[#F3F4F6]">
               PARAKH
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#4A5568]">
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#4A5568] dark:text-[#94A3B8]">
               AI Adaptive Assessment
             </span>
           </div>
@@ -68,7 +70,7 @@ export function Navbar() {
             <a
               key={item.label}
               href={item.href}
-              className="text-sm font-medium text-[#011A53] transition-colors hover:text-[#004CE5]"
+              className="text-sm font-medium text-[#011A53] dark:text-[#CBD5E1] transition-colors hover:text-[#004CE5] dark:hover:text-[#8BB8FF]"
             >
               {item.label}
             </a>
@@ -77,10 +79,18 @@ export function Navbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden items-center gap-3 lg:flex">
+          <button
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2 text-[#64748B] dark:text-[#94A3B8] hover:text-[#004CE5] dark:hover:text-white transition-colors cursor-pointer"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+
           {user ? (
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 bg-[#004CE5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#003FBC]"
+              className="inline-flex items-center gap-2 bg-[#004CE5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1A66FF]"
             >
               <ShieldCheck className="h-4 w-4" />
               Go to Dashboard
@@ -89,14 +99,14 @@ export function Navbar() {
             <>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 border border-[#E6F0FF] bg-[#E6F0FF] px-4 py-2.5 text-sm font-semibold text-[#011A53] transition-colors hover:bg-[#D6E4FF]"
+                className="inline-flex items-center gap-2 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#0F1D3D] px-4 py-2.5 text-sm font-semibold text-[#011A53] dark:text-[#8BB8FF] transition-colors hover:bg-[#D6E4FF] dark:hover:bg-[#15244D]"
               >
                 <LogIn className="h-4 w-4" />
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="inline-flex items-center gap-2 bg-[#004CE5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#003FBC]"
+                className="inline-flex items-center gap-2 bg-[#004CE5] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1A66FF]"
               >
                 <ShieldCheck className="h-4 w-4" />
                 Get Started
@@ -105,16 +115,26 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          aria-label="Toggle navigation"
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center border border-[#E6F0FF] bg-white text-[#011A53] lg:hidden cursor-pointer"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        {/* Mobile controls */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <button
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2 text-[#64748B] dark:text-[#94A3B8]"
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </button>
+
+          <button
+            type="button"
+            aria-label="Toggle navigation"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525] text-[#011A53] dark:text-[#F3F4F6] cursor-pointer"
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -125,7 +145,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-[#E6F0FF] bg-white lg:hidden"
+            className="overflow-hidden border-t border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525] lg:hidden"
           >
             <div className="container-x flex flex-col gap-1 px-6 py-4">
               {NAV_ITEMS.map((item) => (
@@ -133,7 +153,7 @@ export function Navbar() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="border-b border-[#F5F7FA] py-3 text-sm font-medium text-[#011A53] hover:text-[#004CE5]"
+                  className="border-b border-[#F5F7FA] dark:border-[#1C2A4A]/50 py-3 text-sm font-medium text-[#011A53] dark:text-[#CBD5E1] hover:text-[#004CE5] dark:hover:text-[#8BB8FF]"
                 >
                   {item.label}
                 </a>
@@ -153,7 +173,7 @@ export function Navbar() {
                     <Link
                       to="/login"
                       onClick={() => setOpen(false)}
-                      className="inline-flex items-center justify-center gap-2 border border-[#E6F0FF] bg-[#E6F0FF] px-4 py-3 text-sm font-semibold text-[#011A53]"
+                      className="inline-flex items-center justify-center gap-2 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#0F1D3D] px-4 py-3 text-sm font-semibold text-[#011A53] dark:text-[#8BB8FF]"
                     >
                       <LogIn className="h-4 w-4" />
                       Sign In

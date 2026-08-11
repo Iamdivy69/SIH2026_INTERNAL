@@ -15,7 +15,7 @@ import { Footer } from "../components/parakh/Footer";
 
 export default function Landing() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-[#070B15] text-black dark:text-[#F3F4F6] transition-colors duration-200">
       <Navbar />
       <main className="flex-1">
         <Hero />

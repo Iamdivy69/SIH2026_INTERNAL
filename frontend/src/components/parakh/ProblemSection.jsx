@@ -20,7 +20,7 @@ const ADAPTIVE_POINTS = [
 
 export function ProblemSection() {
   return (
-    <section className="border-b border-[#E6F0FF] bg-[#F8FBFF]">
+    <section className="border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#F8FBFF] dark:bg-[#090E1D] transition-colors duration-200">
       <div className="container-x py-16 md:py-24 mx-auto max-w-7xl px-6 md:px-10 lg:px-16 text-left">
         <SectionHeading
           eyebrow="The Problem"
@@ -31,19 +31,19 @@ export function ProblemSection() {
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
           {/* Traditional */}
           <Reveal>
-            <div className="h-full border border-[#E6F0FF] bg-white p-6 md:p-8">
+            <div className="h-full border border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#0F1525] p-6 md:p-8">
               <div className="mb-5 flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-[0.16em] text-[#4A5568]">
+                <span className="text-xs font-medium uppercase tracking-[0.16em] text-[#4A5568] dark:text-[#94A3B8]">
                   Conventional Approach
                 </span>
-                <span className="inline-flex items-center gap-1 border border-[#E6F0FF] bg-[#F5F7FA] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#4A5568]">
+                <span className="inline-flex items-center gap-1 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#F5F7FA] dark:bg-[#1C2A4A] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#4A5568] dark:text-[#94A3B8]">
                   Legacy
                 </span>
               </div>
-              <h3 className="text-xl font-semibold text-[#011A53]">
+              <h3 className="text-xl font-semibold text-[#011A53] dark:text-[#F3F4F6]">
                 Traditional MCQ Testing
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[#4A5568]">
+              <p className="mt-2 text-sm leading-relaxed text-[#4A5568] dark:text-[#94A3B8]">
                 A single static paper is delivered to every learner. Difficulty is
                 frozen at design time, regardless of who is sitting the test.
               </p>
@@ -51,9 +51,9 @@ export function ProblemSection() {
                 {TRADITIONAL_POINTS.map((point) => (
                   <li
                     key={point}
-                    className="flex items-start gap-3 text-sm text-[#011A53]"
+                    className="flex items-start gap-3 text-sm text-[#011A53] dark:text-[#CBD5E1]"
                   >
-                    <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center bg-[#F5F7FA] text-[#4A5568]">
+                    <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center bg-[#F5F7FA] dark:bg-[#1C2A4A] text-[#4A5568] dark:text-[#94A3B8]">
                       <X className="h-3 w-3" />
                     </span>
                     {point}
@@ -65,13 +65,13 @@ export function ProblemSection() {
 
           {/* Adaptive */}
           <Reveal delay={0.08}>
-            <div className="relative h-full border border-[#004CE5] bg-[#011A53] p-6 text-white md:p-8">
+            <div className="relative h-full border border-[#004CE5] bg-[#011A53] dark:bg-[#0A132C] p-6 text-white md:p-8">
               <div
                 className="pointer-events-none absolute right-0 top-0 h-32 w-32 bg-[#004CE5]/30 blur-3xl"
                 aria-hidden
               />
               <div className="relative mb-5 flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-[0.16em] text-[#B0C4FF]">
+                <span className="text-xs font-medium uppercase tracking-[0.16em] text-[#B0C4FF] dark:text-[#8BB8FF]">
                   PARAKH Approach
                 </span>
                 <span className="inline-flex items-center gap-1 border border-[#004CE5] bg-[#004CE5] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
@@ -81,7 +81,7 @@ export function ProblemSection() {
               <h3 className="relative text-xl font-semibold text-white">
                 PARAKH Adaptive Assessment
               </h3>
-              <p className="relative mt-2 text-sm leading-relaxed text-[#B0C4FF]">
+              <p className="relative mt-2 text-sm leading-relaxed text-[#B0C4FF] dark:text-[#8BB8FF]">
                 Each response updates a live ability estimate. The next item is
                 selected to maximise information about that specific learner.
               </p>

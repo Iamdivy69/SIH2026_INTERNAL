@@ -18,14 +18,14 @@ export function SectionHeading({
     >
       {eyebrow && (
         <Reveal>
-          <span className="inline-flex items-center gap-2 border border-[#E6F0FF] bg-[#E6F0FF]/60 px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-[#011A53]">
+          <span className="inline-flex items-center gap-2 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF]/60 dark:bg-[#0F1D3D] px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-[#011A53] dark:text-[#8BB8FF]">
             <span className="h-1.5 w-1.5 bg-[#004CE5]" />
             {eyebrow}
           </span>
         </Reveal>
       )}
       <Reveal delay={0.05}>
-        <h2 className="max-w-3xl text-3xl font-semibold leading-[1.1] tracking-tight text-black md:text-4xl lg:text-[44px]">
+        <h2 className="max-w-3xl text-3xl font-semibold leading-[1.1] tracking-tight text-black dark:text-[#F3F4F6] md:text-4xl lg:text-[44px]">
           {title}
         </h2>
       </Reveal>
@@ -33,7 +33,7 @@ export function SectionHeading({
         <Reveal delay={0.1}>
           <p
             className={cn(
-              "max-w-2xl text-base leading-relaxed text-[#4A5568] md:text-lg",
+              "max-w-2xl text-base leading-relaxed text-[#4A5568] dark:text-[#94A3B8] md:text-lg",
               align === "center" ? "mx-auto" : ""
             )}
           >

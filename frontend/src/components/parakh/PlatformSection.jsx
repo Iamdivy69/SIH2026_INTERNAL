@@ -35,7 +35,7 @@ const MODULES = [
 
 export function PlatformSection() {
   return (
-    <section id="platform" className="border-b border-[#E6F0FF] bg-white">
+    <section id="platform" className="border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#070B15] transition-colors duration-200">
       <div className="container-x py-16 md:py-24 mx-auto max-w-7xl px-6 md:px-10 lg:px-16 text-left">
         <SectionHeading
           eyebrow="The Platform"
@@ -43,33 +43,33 @@ export function PlatformSection() {
           subtitle="Four tightly-integrated modules move each learner from a baseline estimate to a calibrated, auditable proficiency score."
         />
 
-        <div className="mt-12 grid gap-px overflow-hidden border border-[#E6F0FF] bg-[#E6F0FF] md:grid-cols-2">
+        <div className="mt-12 grid gap-px overflow-hidden border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#1C2A4A] md:grid-cols-2">
           {MODULES.map((mod, idx) => {
             const Icon = mod.icon;
             return (
               <Reveal key={mod.title} delay={idx * 0.06}>
-                <div className="group h-full bg-white p-6 transition-colors hover:bg-[#F8FBFF] md:p-8">
+                <div className="group h-full bg-white dark:bg-[#0F1525] p-6 transition-colors hover:bg-[#F8FBFF] dark:hover:bg-[#121A2E] md:p-8">
                   <div className="flex items-start gap-5">
-                    <div className="flex h-12 w-12 flex-none items-center justify-center bg-[#011A53] text-white transition-colors group-hover:bg-[#004CE5]">
+                    <div className="flex h-12 w-12 flex-none items-center justify-center bg-[#011A53] dark:bg-[#004CE5] text-white transition-colors group-hover:bg-[#004CE5] dark:group-hover:bg-[#1A66FF]">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 text-left">
-                        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#004CE5]">
+                        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[#004CE5] dark:text-[#8BB8FF]">
                           Module {String(idx + 1).padStart(2, "0")}
                         </span>
                       </div>
-                      <h3 className="mt-1 text-xl font-semibold text-[#011A53] text-left">
+                      <h3 className="mt-1 text-xl font-semibold text-[#011A53] dark:text-[#F3F4F6] text-left">
                         {mod.title}
                       </h3>
-                      <p className="mt-2 text-sm leading-relaxed text-[#4A5568] text-left">
+                      <p className="mt-2 text-sm leading-relaxed text-[#4A5568] dark:text-[#94A3B8] text-left">
                         {mod.description}
                       </p>
                       <ul className="mt-5 flex flex-wrap gap-2">
                         {mod.items.map((item) => (
                           <li
                             key={item}
-                            className="border border-[#E6F0FF] bg-[#E6F0FF]/60 px-2.5 py-1 text-xs font-medium text-[#011A53]"
+                            className="border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF]/60 dark:bg-[#0F1D3D] px-2.5 py-1 text-xs font-medium text-[#011A53] dark:text-[#8BB8FF]"
                           >
                             {item}
                           </li>

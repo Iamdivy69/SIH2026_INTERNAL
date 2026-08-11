@@ -31,7 +31,7 @@ const CARDS = [
 
 export function SecuritySection() {
   return (
-    <section id="security" className="border-b border-[#E6F0FF] bg-white">
+    <section id="security" className="border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#070B15] transition-colors duration-200">
       <div className="container-x py-16 md:py-24 mx-auto max-w-7xl px-6 md:px-10 lg:px-16 text-left">
         <SectionHeading
           eyebrow="Security & Integrity"
@@ -39,23 +39,23 @@ export function SecuritySection() {
           subtitle="A layered trust model — from item security through proctoring to auditability — designed to meet the integrity bar of national-level assessment."
         />
 
-        <div className="mt-12 grid gap-px overflow-hidden border border-[#E6F0FF] bg-[#E6F0FF] md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-px overflow-hidden border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#1C2A4A] md:grid-cols-2 lg:grid-cols-4">
           {CARDS.map((card, idx) => {
             const Icon = card.icon;
             return (
               <Reveal key={card.title} delay={idx * 0.05}>
-                <div className="group h-full bg-white p-6 md:p-8">
-                  <div className="flex h-11 w-11 items-center justify-center bg-[#011A53] text-white transition-colors group-hover:bg-[#004CE5]">
+                <div className="group h-full bg-white dark:bg-[#0F1525] p-6 md:p-8">
+                  <div className="flex h-11 w-11 items-center justify-center bg-[#011A53] dark:bg-[#0F1D3D] text-white dark:text-[#8BB8FF] transition-colors group-hover:bg-[#004CE5] dark:group-hover:bg-[#1A66FF] group-hover:text-white">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mt-5 text-lg font-semibold text-[#011A53]">
+                  <h3 className="mt-5 text-lg font-semibold text-[#011A53] dark:text-[#F3F4F6]">
                     {card.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#4A5568]">
+                  <p className="mt-2 text-sm leading-relaxed text-[#4A5568] dark:text-[#94A3B8]">
                     {card.description}
                   </p>
-                  <div className="mt-5 h-px w-full bg-[#E6F0FF]" />
-                  <p className="mt-3 text-[11px] font-medium uppercase tracking-wider text-[#4A5568]">
+                  <div className="mt-5 h-px w-full bg-[#E6F0FF] dark:bg-[#1C2A4A]" />
+                  <p className="mt-3 text-[11px] font-medium uppercase tracking-wider text-[#4A5568] dark:text-[#94A3B8]">
                     Layer {String(idx + 1).padStart(2, "0")} · Always on
                   </p>
                 </div>

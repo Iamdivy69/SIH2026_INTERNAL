@@ -63,7 +63,7 @@ const FEATURES = [
 
 export function AIQuestionGeneration() {
   return (
-    <section id="ai-generation" className="border-b border-[#E6F0FF] bg-white">
+    <section id="ai-generation" className="border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white dark:bg-[#070B15] transition-colors duration-200">
       <div className="container-x py-16 md:py-24 mx-auto max-w-7xl px-6 md:px-10 lg:px-16 text-left">
         <SectionHeading
           eyebrow="AI Question Generation"
@@ -73,7 +73,7 @@ export function AIQuestionGeneration() {
 
         {/* Pipeline */}
         <Reveal>
-          <div className="mt-12 border border-[#E6F0FF] bg-[#F8FBFF] p-6 md:p-8">
+          <div className="mt-12 border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#F8FBFF] dark:bg-[#090E1D] p-6 md:p-8">
             <div className="grid gap-4 md:grid-cols-5">
               {PIPELINE.map((step, idx) => {
                 const Icon = step.icon;
@@ -86,19 +86,19 @@ export function AIQuestionGeneration() {
                     transition={{ delay: idx * 0.08, duration: 0.4 }}
                     className="relative text-left"
                   >
-                    <div className="flex h-full flex-col bg-white p-5">
+                    <div className="flex h-full flex-col bg-white dark:bg-[#0F1525] p-5">
                       <div className="flex items-center justify-between">
                         <div className="flex h-10 w-10 items-center justify-center bg-[#004CE5] text-white">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <span className="text-xs font-semibold text-[#4A5568]">
+                        <span className="text-xs font-semibold text-[#4A5568] dark:text-[#94A3B8]">
                           {String(idx + 1).padStart(2, "0")}
                         </span>
                       </div>
-                      <h3 className="mt-4 text-sm font-semibold text-[#011A53]">
+                      <h3 className="mt-4 text-sm font-semibold text-[#011A53] dark:text-[#F3F4F6]">
                         {step.label}
                       </h3>
-                      <p className="mt-1.5 text-xs leading-relaxed text-[#4A5568]">
+                      <p className="mt-1.5 text-xs leading-relaxed text-[#4A5568] dark:text-[#94A3B8]">
                         {step.detail}
                       </p>
                     </div>
@@ -115,15 +115,15 @@ export function AIQuestionGeneration() {
         </Reveal>
 
         {/* Feature grid */}
-        <div className="mt-8 grid gap-px overflow-hidden border border-[#E6F0FF] bg-[#E6F0FF] md:grid-cols-2">
+        <div className="mt-8 grid gap-px overflow-hidden border border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#E6F0FF] dark:bg-[#1C2A4A] md:grid-cols-2">
           {FEATURES.map((feat, idx) => (
             <Reveal key={feat.title} delay={idx * 0.06}>
-              <div className="h-full bg-white p-6 md:p-8">
-                <h3 className="flex items-center gap-2 text-base font-semibold text-[#011A53]">
+              <div className="h-full bg-white dark:bg-[#0F1525] p-6 md:p-8">
+                <h3 className="flex items-center gap-2 text-base font-semibold text-[#011A53] dark:text-[#F3F4F6]">
                   <span className="h-1.5 w-1.5 bg-[#004CE5]" />
                   {feat.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#4A5568]">
+                <p className="mt-3 text-sm leading-relaxed text-[#4A5568] dark:text-[#94A3B8]">
                   {feat.description}
                 </p>
               </div>

@@ -55,33 +55,33 @@ export function AdaptiveEngine() {
   return (
     <section
       id="adaptive-engine"
-      className="relative overflow-hidden border-b border-[#E6F0FF] bg-[#011A53] text-white text-left"
+      className="relative overflow-hidden border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-[#011A53] dark:bg-[#070B15] text-white text-left transition-colors duration-200"
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="pointer-events-none absolute inset-0 opacity-[0.06] dark:opacity-[0.03]"
         style={{
           backgroundImage:
             "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
-      <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#004CE5]/40 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#004CE5]/40 dark:bg-[#004CE5]/20 blur-3xl" />
 
       <div className="container-x relative py-16 md:py-24 mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
         <div className="flex flex-col items-center text-center">
           <Reveal>
-            <span className="inline-flex items-center gap-2 border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-[#B0C4FF]">
+            <span className="inline-flex items-center gap-2 border border-white/15 dark:border-[#1C2A4A] bg-white/5 dark:bg-[#0F1D3D] px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-[#B0C4FF] dark:text-[#8BB8FF]">
               <span className="h-1.5 w-1.5 bg-[#004CE5]" />
               Adaptive Engine
             </span>
           </Reveal>
           <Reveal delay={0.05}>
-            <h2 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-tight md:text-4xl lg:text-[44px]">
+            <h2 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.1] tracking-tight md:text-4xl lg:text-[44px] text-white dark:text-[#F3F4F6]">
               Every Question Learns From The Previous Answer
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#B0C4FF] md:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#B0C4FF] dark:text-[#94A3B8] md:text-lg">
               The adaptive engine turns each response into a measurable signal —
               then selects the next item that will most reduce uncertainty about
               the student&apos;s true ability.
@@ -102,17 +102,17 @@ export function AdaptiveEngine() {
                 transition={{ delay: idx * 0.08, duration: 0.45 }}
                 className="relative"
               >
-                <div className="h-full border border-white/10 bg-white/[0.04] p-5 transition-colors hover:border-[#004CE5] hover:bg-white/[0.07] text-left">
+                <div className="h-full border border-white/10 dark:border-[#1C2A4A] bg-white/[0.04] dark:bg-[#0F1525] p-5 transition-colors hover:border-[#004CE5] dark:hover:border-[#004CE5] hover:bg-white/[0.07] dark:hover:bg-[#121A2E] text-left">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#004CE5]">
+                    <span className="text-xs font-semibold text-[#004CE5] dark:text-[#8BB8FF]">
                       {String(idx + 1).padStart(2, "0")}
                     </span>
-                    <Icon className="h-5 w-5 text-[#B0C4FF]" />
+                    <Icon className="h-5 w-5 text-[#B0C4FF] dark:text-[#8BB8FF]" />
                   </div>
-                  <h3 className="mt-3 text-sm font-semibold text-white">
+                  <h3 className="mt-3 text-sm font-semibold text-white dark:text-[#F3F4F6]">
                     {step.label}
                   </h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-[#B0C4FF]">
+                  <p className="mt-1.5 text-xs leading-relaxed text-[#B0C4FF] dark:text-[#94A3B8]">
                     {step.detail}
                   </p>
                 </div>
@@ -128,22 +128,22 @@ export function AdaptiveEngine() {
 
         {/* Signals considered */}
         <Reveal delay={0.1}>
-          <div className="mt-12 border border-white/10 bg-white/[0.03] p-6 md:p-8">
+          <div className="mt-12 border border-white/10 dark:border-[#1C2A4A] bg-white/[0.03] dark:bg-[#0F1525] p-6 md:p-8">
             <div className="mb-5 flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
-              <h3 className="text-base font-semibold text-white">
+              <h3 className="text-base font-semibold text-white dark:text-[#F3F4F6]">
                 Signals considered for each next-item decision
               </h3>
-              <span className="text-xs font-medium uppercase tracking-wider text-[#B0C4FF]">
+              <span className="text-xs font-medium uppercase tracking-wider text-[#B0C4FF] dark:text-[#94A3B8]">
                 Updated after every response
               </span>
             </div>
-            <div className="grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-px overflow-hidden border border-white/10 dark:border-[#1C2A4A] bg-white/10 dark:bg-[#1C2A4A] sm:grid-cols-2 lg:grid-cols-5">
               {SIGNALS.map((sig) => (
-                <div key={sig.label} className="bg-[#011A53] p-4">
-                  <p className="text-xs font-medium uppercase tracking-wider text-[#B0C4FF]">
+                <div key={sig.label} className="bg-[#011A53] dark:bg-[#090E1D] p-4">
+                  <p className="text-xs font-medium uppercase tracking-wider text-[#B0C4FF] dark:text-[#94A3B8]">
                     {sig.label}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-white">
+                  <p className="mt-1 text-sm font-semibold text-white dark:text-[#F3F4F6]">
                     {sig.value}
                   </p>
                 </div>
