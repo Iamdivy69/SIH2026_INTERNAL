@@ -206,43 +206,49 @@ function PreTestRules({ mode, concept, onConfirm, onCancel }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010D26]/95 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center portal-grid-bg p-6">
       <div className="w-full max-w-2xl">
 
         {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#004CE5]/15 border border-[#004CE5]/30 mb-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#004CE5] animate-pulse" />
-            <span className="text-xs font-semibold text-[#004CE5] uppercase tracking-widest">{info.badge}</span>
-          </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">{info.title}</h1>
-          <p className="text-sm text-[#8BB8FF]/70 max-w-md mx-auto leading-relaxed">{info.sub}</p>
+        <div className="mb-6 text-center">
+          <span className="chip chip-blue text-xs font-semibold uppercase tracking-widest mb-3 inline-flex">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#004CE5] dark:bg-[#8BB8FF] animate-pulse mr-1.5 self-center" />
+            {info.badge}
+          </span>
+          <h1 className="text-3xl font-extrabold text-black dark:text-[#F3F4F6] tracking-tight mb-2">{info.title}</h1>
+          <p className="text-sm text-[#64748B] dark:text-[#94A3B8] max-w-md mx-auto leading-relaxed">{info.sub}</p>
         </div>
 
         {/* Rules card */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden mb-6">
-          <div className="px-6 py-4 border-b border-white/10 flex items-center gap-3">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BB8FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="card p-0 overflow-hidden mb-5">
+          <div className="px-5 py-3.5 border-b border-[#E6F0FF] dark:border-[#1C2A4A] flex items-center gap-2.5">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#004CE5] dark:text-[#8BB8FF]">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
-            <span className="text-sm font-semibold text-[#8BB8FF] uppercase tracking-wider">Proctoring Rules & System Monitoring</span>
+            <span className="text-xs font-bold text-[#011A53] dark:text-[#8BB8FF] uppercase tracking-wider">
+              Proctoring Rules &amp; System Monitoring
+            </span>
           </div>
 
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-[#E6F0FF] dark:divide-[#1C2A4A]">
             {rules.map((rule, i) => (
-              <div key={i} className="flex items-start gap-4 px-6 py-4">
+              <div key={i} className="flex items-start gap-4 px-5 py-4">
                 <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
                   rule.critical
-                    ? 'bg-[#dc2626]/15 text-[#f87171]'
-                    : 'bg-[#004CE5]/15 text-[#8BB8FF]'
+                    ? 'bg-[#fdeaea] dark:bg-[#2e0f0f] text-[#dc2626] dark:text-[#f87171]'
+                    : 'bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#004CE5] dark:text-[#8BB8FF]'
                 }`}>
                   {rule.icon}
                 </div>
                 <div>
-                  <p className={`text-sm font-semibold mb-0.5 ${rule.critical ? 'text-[#f87171]' : 'text-white'}`}>
+                  <p className={`text-sm font-semibold mb-0.5 ${
+                    rule.critical
+                      ? 'text-[#dc2626] dark:text-[#f87171]'
+                      : 'text-black dark:text-[#F3F4F6]'
+                  }`}>
                     {rule.label}
                   </p>
-                  <p className="text-xs text-white/50 leading-relaxed">{rule.desc}</p>
+                  <p className="text-xs text-[#64748B] dark:text-[#94A3B8] leading-relaxed">{rule.desc}</p>
                 </div>
               </div>
             ))}
@@ -253,13 +259,13 @@ function PreTestRules({ mode, concept, onConfirm, onCancel }) {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onConfirm}
-            className="flex-1 py-3.5 px-6 rounded-xl bg-[#004CE5] hover:bg-[#0040C8] text-white text-sm font-bold tracking-wide transition-all duration-150 shadow-lg shadow-[#004CE5]/30"
+            className="btn-primary flex-1 font-bold text-sm py-3.5"
           >
             I Understand — Start Assessment
           </button>
           <button
             onClick={onCancel}
-            className="px-6 py-3.5 rounded-xl border border-white/15 text-sm font-medium text-white/50 hover:text-white hover:border-white/30 transition-all duration-150"
+            className="btn-secondary px-6 py-3.5 text-sm font-medium"
           >
             Cancel
           </button>
@@ -268,7 +274,6 @@ function PreTestRules({ mode, concept, onConfirm, onCancel }) {
     </div>
   );
 }
-
 
 export default function Assessment() {
   const { authHeader, refreshUser, API } = useAuth();
