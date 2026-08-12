@@ -40,26 +40,13 @@ export function Navbar() {
       <div className="container-x flex h-16 items-center justify-between px-6 md:px-10 lg:px-16 mx-auto max-w-7xl">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center bg-[#004CE5]">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-5 w-5 text-white"
-              aria-hidden="true"
-            >
-              <path
-                d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"
-                fill="currentColor"
-                opacity="0.9"
-              />
-            </svg>
-          </div>
+          <img src="/favicon.svg" alt="PARAKH AI Logo" className="w-8 h-8 rounded-lg shadow-sm" />
           <div className="flex flex-col leading-none text-left">
-            <span className="text-base font-semibold tracking-tight text-black dark:text-[#F3F4F6]">
-              PARAKH
+            <span className="text-base font-extrabold tracking-tight text-black dark:text-[#F3F4F6]">
+              PARAKH <span className="text-[#004CE5]">AI</span>
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#4A5568] dark:text-[#94A3B8]">
-              AI Adaptive Assessment
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#64748B] dark:text-[#94A3B8]">
+              AI ADAPTIVE ASSESSMENT
             </span>
           </div>
         </Link>

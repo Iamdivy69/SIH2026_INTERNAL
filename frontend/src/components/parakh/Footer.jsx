@@ -59,26 +59,13 @@ export function Footer() {
           {/* Brand block */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center bg-[#004CE5]">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-5 w-5 text-white"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"
-                    fill="currentColor"
-                    opacity="0.9"
-                  />
-                </svg>
-              </div>
+              <img src="/favicon.svg" alt="PARAKH AI Logo" className="w-8 h-8 rounded-lg shadow-sm" />
               <div className="flex flex-col leading-none">
-                <span className="text-base font-semibold tracking-tight text-white">
-                  PARAKH
+                <span className="text-base font-extrabold tracking-tight text-white">
+                  PARAKH <span className="text-[#8BB8FF]">AI</span>
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#B0C4FF] dark:text-[#8BB8FF]">
-                  AI Adaptive Assessment
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B0C4FF] dark:text-[#8BB8FF]">
+                  AI ADAPTIVE ASSESSMENT
                 </span>
               </div>
             </div>
