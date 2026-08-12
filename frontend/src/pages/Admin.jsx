@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Users, ClipboardList, TrendingUp, Database, ShieldAlert } from 'lucide-react';
 
-function KpiCard({ title, value, subtitle, icon, highlight }) {
+function KpiCard({ title, value, subtitle, icon: Icon, highlight }) {
   return (
     <div className="card space-y-2 p-5 border border-[#E6F0FF] dark:border-[#1C2A4A] relative overflow-hidden">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-[#94A3B8]">{title}</span>
-        <span className="text-xl">{icon}</span>
+        <div className={`p-2 rounded-xl ${highlight ? 'bg-[#fee2e2] dark:bg-[#3b1212] text-[#dc2626] dark:text-[#f87171]' : 'bg-[#f0f5ff] dark:bg-[#152038] text-[#004CE5] dark:text-[#38bdf8]'}`}>
+          <Icon className="w-4 h-4" />
+        </div>
       </div>
       <div className="text-3xl font-extrabold text-black dark:text-[#F3F4F6] tracking-tight">
         {value}
@@ -114,31 +117,31 @@ export default function Admin() {
               title="Total Students"
               value={overview.totalStudents}
               subtitle="Registered active learners"
-              icon="🎓"
+              icon={Users}
             />
             <KpiCard
               title="Assessments"
               value={overview.totalAssessments}
               subtitle="Completed tests"
-              icon="📝"
+              icon={ClipboardList}
             />
             <KpiCard
               title="Avg Institution Mastery"
               value={`${overview.avgInstitutionMastery}%`}
               subtitle="Across all concepts"
-              icon="⚡"
+              icon={TrendingUp}
             />
             <KpiCard
               title="Question Bank"
               value={overview.questionBankSize}
               subtitle="Total questions available"
-              icon="📚"
+              icon={Database}
             />
             <KpiCard
               title="Weekly Violations"
               value={overview.violationsThisWeek}
               subtitle={overview.violationsThisWeek > 0 ? "Requires review" : "Clean record (7 days)"}
-              icon="⚠️"
+              icon={ShieldAlert}
               highlight={overview.violationsThisWeek > 0}
             />
           </div>

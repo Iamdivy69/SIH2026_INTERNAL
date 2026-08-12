@@ -136,11 +136,11 @@ export default function StudentRoster() {
                     <td className="p-4">
                       {st.flagged ? (
                         <span className="chip chip-red font-semibold">
-                          ⚠️ Flagged (Terminated/High Violations)
+                          Flagged (High Violations)
                         </span>
                       ) : (
                         <span className="chip chip-green font-semibold">
-                          ✓ Normal
+                          Normal
                         </span>
                       )}
                     </td>
