@@ -703,11 +703,11 @@ export default function Assessment() {
                       View Assessment Results &rarr;
                     </button>
                     <button
-                      id="return-dashboard"
-                      onClick={() => handleCompleteNavigation('/dashboard')}
+                      id="view-knowledge"
+                      onClick={() => handleCompleteNavigation('/knowledge')}
                       className="btn-secondary flex-1 font-bold text-sm py-3 text-center"
                     >
-                      Return to Dashboard
+                      View Knowledge Profile
                     </button>
                   </div>
                 ) : (
