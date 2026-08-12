@@ -3,8 +3,16 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-// Connect to MongoDB
+// Connect to MongoDB & ensure demo accounts exist
 connectDB();
+const User = require('./models/User');
+User.findOne({ email: 'aksh@demo.com' }).then(async (found) => {
+  if (!found) {
+    console.log('🌱 Demo accounts missing in database. Auto-seeding target accounts...');
+    const seedAdmin = require('./scripts/seedAdminAndStudents');
+    if (typeof seedAdmin === 'function') await seedAdmin();
+  }
+}).catch(err => console.error('Demo user check error:', err));
 
 const app = express();
 

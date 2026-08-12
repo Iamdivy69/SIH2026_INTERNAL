@@ -143,4 +143,16 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
+// ── POST /api/auth/seed-demo — endpoint to re-seed demo users ──
+router.post('/seed-demo', async (req, res) => {
+  try {
+    const seedAdmin = require('../scripts/seedAdminAndStudents');
+    await seedAdmin();
+    return res.json({ message: 'Demo accounts seeded successfully.' });
+  } catch (err) {
+    console.error('Seed demo endpoint error:', err);
+    return res.status(500).json({ message: 'Failed to seed demo accounts.', error: err.message });
+  }
+});
+
 module.exports = router;
