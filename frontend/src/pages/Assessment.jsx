@@ -471,11 +471,37 @@ export default function Assessment() {
     }
   };
 
+  const handleCompleteNavigation = useCallback((path, navState) => {
+    try {
+      if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
+        document.exitFullscreen().catch(() => {});
+      }
+    } catch {
+      // ignore
+    }
+
+    if (typeof refreshUser === 'function') {
+      try { refreshUser(); } catch { /* ignore */ }
+    }
+
+    setTimeout(() => {
+      navigate(path, navState ? { state: navState } : undefined);
+    }, 50);
+  }, [navigate, refreshUser]);
+
+  // Auto-transition to results page after displaying final question feedback for 2.2s
+  useEffect(() => {
+    if (state === 'revealing' && questionsAnswered >= totalQuestions && totalQuestions > 0) {
+      const timer = setTimeout(() => {
+        handleCompleteNavigation('/results', { sessionId, mode });
+      }, 2200);
+      return () => clearTimeout(timer);
+    }
+  }, [state, questionsAnswered, totalQuestions, sessionId, mode, handleCompleteNavigation]);
+
   const handleNext = () => {
     if (questionsAnswered >= totalQuestions) {
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-      if (typeof refreshUser === 'function') refreshUser();
-      navigate('/dashboard');
+      handleCompleteNavigation('/results', { sessionId, mode });
     } else {
       fetchNextQuestion();
     }
@@ -670,26 +696,18 @@ export default function Assessment() {
                 {questionsAnswered >= totalQuestions ? (
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
-                      id="return-dashboard"
-                      onClick={() => {
-                        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-                        if (typeof refreshUser === 'function') refreshUser();
-                        navigate('/dashboard');
-                      }}
+                      id="view-results"
+                      onClick={() => handleCompleteNavigation('/results', { sessionId, mode })}
                       className="btn-primary flex-1 font-bold text-sm py-3 text-center"
                     >
-                      Return to Dashboard &rarr;
+                      View Assessment Results &rarr;
                     </button>
                     <button
-                      id="view-results"
-                      onClick={() => {
-                        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-                        if (typeof refreshUser === 'function') refreshUser();
-                        navigate('/results', { state: { sessionId, mode } });
-                      }}
+                      id="return-dashboard"
+                      onClick={() => handleCompleteNavigation('/dashboard')}
                       className="btn-secondary flex-1 font-bold text-sm py-3 text-center"
                     >
-                      View Detailed Profile
+                      Return to Dashboard
                     </button>
                   </div>
                 ) : (
