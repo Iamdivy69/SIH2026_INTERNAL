@@ -278,7 +278,13 @@ export default function Assessment() {
   };
 
   const reportViolation = useCallback((type) => {
-    if (isTerminatedRef.current || state === 'rules' || state === 'done' || state === 'terminated') return;
+    if (
+      isTerminatedRef.current ||
+      state === 'rules' ||
+      state === 'done' ||
+      state === 'terminated' ||
+      questionsAnswered >= totalQuestions
+    ) return;
 
     const now = Date.now();
     if (now - lastViolationRef.current < 1000) return;
@@ -301,30 +307,30 @@ export default function Assessment() {
         }
       })
       .catch(err => console.error('Violation report error:', err));
-  }, [sessionId, API, authHeader, state]);
+  }, [sessionId, API, authHeader, state, questionsAnswered, totalQuestions]);
 
   // Handle visibility, fullscreen, blur, and popstate navigation attempts
   useEffect(() => {
-    if (state === 'rules') return;
+    if (state === 'rules' || state === 'done' || state === 'terminated' || questionsAnswered >= totalQuestions) return;
 
     const handleVisibility = () => {
-      if (document.hidden) reportViolation('tab_switch');
+      if (document.hidden && questionsAnswered < totalQuestions) reportViolation('tab_switch');
     };
     const handleFullscreen = () => {
-      if (!document.fullscreenElement && state !== 'done' && state !== 'terminated') {
+      if (!document.fullscreenElement && state !== 'done' && state !== 'terminated' && questionsAnswered < totalQuestions) {
         reportViolation('fullscreen_exit');
       }
     };
     const handleBlur = () => {
-      reportViolation('window_blur');
+      if (questionsAnswered < totalQuestions) reportViolation('window_blur');
     };
 
     // Lock browser back/forward buttons during test
-    if (state !== 'done' && state !== 'terminated') {
+    if (questionsAnswered < totalQuestions) {
       window.history.pushState(null, '', window.location.href);
     }
     const handlePopState = (e) => {
-      if (state !== 'done' && state !== 'terminated') {
+      if (questionsAnswered < totalQuestions) {
         window.history.pushState(null, '', window.location.href);
         reportViolation('navigation_attempt');
       }
@@ -341,7 +347,7 @@ export default function Assessment() {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [reportViolation, state]);
+  }, [reportViolation, state, questionsAnswered, totalQuestions]);
 
   const fetchNextQuestion = useCallback(async () => {
     if (isTerminatedRef.current) return;

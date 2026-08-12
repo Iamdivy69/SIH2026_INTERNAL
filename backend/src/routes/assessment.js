@@ -109,6 +109,74 @@ router.get('/current', authMiddleware, async (req, res) => {
   }
 });
 
+// ── GET /api/assessment/summary?sessionId=xxx ─────────────────────
+router.get('/summary', authMiddleware, async (req, res) => {
+  try {
+    const { sessionId } = req.query;
+    const userId = req.user.id;
+
+    let responses = [];
+    let sessionDoc = null;
+
+    if (sessionId) {
+      sessionDoc = await AssessmentSession.findOne({ sessionId, userId }).lean();
+      responses = await Response.find({ userId, sessionId }).populate('questionId').lean();
+    }
+
+    if (!responses.length) {
+      // Fallback: fetch latest responses if no specific sessionId provided
+      responses = await Response.find({ userId }).sort({ createdAt: -1 }).limit(10).populate('questionId').lean();
+    }
+
+    const totalAnswered = responses.length;
+    const correctCount = responses.filter(r => r.isCorrect).length;
+    const accuracyPct = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+
+    const questionBreakdown = responses.map(r => {
+      const q = r.questionId || {};
+      return {
+        questionId: q._id || r.questionId,
+        text: q.text || 'Question text unavailable',
+        options: q.options || [],
+        correctAnswer: q.correctAnswer !== undefined ? q.correctAnswer : 0,
+        selectedAnswer: r.selectedAnswer,
+        isCorrect: r.isCorrect,
+        explanation: q.explanation || '',
+        concept: r.concept || q.concept || 'General',
+        difficulty: r.difficulty || q.difficulty || 1,
+        timeSpent: r.timeSpent || 0,
+      };
+    });
+
+    const concepts = await StudentConcept.find({ userId }).lean();
+    const strong = concepts.filter(c => c.mastery >= 70);
+    const developing = concepts.filter(c => c.mastery >= 40 && c.mastery < 70);
+    const weak = concepts.filter(c => c.mastery < 40);
+
+    const overallMastery = concepts.length > 0
+      ? Math.round(concepts.reduce((acc, c) => acc + c.mastery, 0) / concepts.length)
+      : 0;
+
+    return res.json({
+      session: sessionDoc,
+      totalAnswered,
+      correctCount,
+      accuracyPct,
+      questionBreakdown,
+      studentState: {
+        concepts,
+        overallMastery,
+        strong,
+        developing,
+        weak,
+      },
+    });
+  } catch (err) {
+    console.error('GET /api/assessment/summary error:', err);
+    return res.status(500).json({ message: 'Server error fetching session summary.' });
+  }
+});
+
 // ── POST /api/assessment/start ────────────────────────────────────
 router.post('/start', authMiddleware, async (req, res) => {
   try {
