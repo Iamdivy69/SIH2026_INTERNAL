@@ -413,7 +413,7 @@ export default function Assessment() {
   useEffect(() => {
     if (state === 'done') {
       if (typeof refreshUser === 'function') refreshUser();
-      setTimeout(() => navigate('/results', { state: { sessionId, mode } }), 800);
+      setTimeout(() => navigate('/assessment/results', { state: { sessionId, mode } }), 800);
     }
   }, [state, navigate, sessionId, mode, refreshUser]);
 
@@ -493,7 +493,7 @@ export default function Assessment() {
   useEffect(() => {
     if (state === 'revealing' && questionsAnswered >= totalQuestions && totalQuestions > 0) {
       const timer = setTimeout(() => {
-        handleCompleteNavigation('/results', { sessionId, mode });
+        handleCompleteNavigation('/assessment/results', { sessionId, mode });
       }, 2200);
       return () => clearTimeout(timer);
     }
@@ -501,7 +501,7 @@ export default function Assessment() {
 
   const handleNext = () => {
     if (questionsAnswered >= totalQuestions) {
-      handleCompleteNavigation('/results', { sessionId, mode });
+      handleCompleteNavigation('/assessment/results', { sessionId, mode });
     } else {
       fetchNextQuestion();
     }
@@ -697,7 +697,7 @@ export default function Assessment() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       id="view-results"
-                      onClick={() => handleCompleteNavigation('/results', { sessionId, mode })}
+                      onClick={() => handleCompleteNavigation('/assessment/results', { sessionId, mode })}
                       className="btn-primary flex-1 font-bold text-sm py-3 text-center"
                     >
                       View Assessment Results &rarr;
