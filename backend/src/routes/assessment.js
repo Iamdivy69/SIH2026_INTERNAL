@@ -187,21 +187,29 @@ router.post('/start', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'sessionId is required.' });
     }
 
-    // Terminate any previous lingering in_progress sessions for this user
+    // Terminate any OTHER previous lingering in_progress sessions for this user
     await AssessmentSession.updateMany(
-      { userId, status: 'in_progress' },
+      { userId, status: 'in_progress', sessionId: { $ne: sessionId } },
       { $set: { status: 'terminated', terminationReason: 'new_session_started' } }
     );
 
-    const sessionDoc = await AssessmentSession.create({
-      userId,
-      sessionId,
-      mode,
-      concept,
-      status: 'in_progress',
-      violationCount: 0,
-      violations: [],
-    });
+    let sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
+    if (!sessionDoc) {
+      sessionDoc = await AssessmentSession.create({
+        userId,
+        sessionId,
+        mode,
+        concept,
+        status: 'in_progress',
+        violationCount: 0,
+        violations: [],
+      });
+    } else {
+      sessionDoc.status = 'in_progress';
+      sessionDoc.mode = mode;
+      if (concept) sessionDoc.concept = concept;
+      await sessionDoc.save();
+    }
 
     return res.status(201).json({ session: sessionDoc });
   } catch (err) {
@@ -231,9 +239,13 @@ router.post('/violation', authMiddleware, async (req, res) => {
       });
     }
 
-    if (sessionDoc.status === 'terminated') {
+    if (sessionDoc.status === 'completed') {
+      return res.json({ violationCount: sessionDoc.violationCount, isTerminated: false });
+    }
+
+    if (sessionDoc.status === 'terminated' && sessionDoc.terminationReason === 'excessive_violations') {
       return res.status(403).json({
-        message: 'Assessment already terminated due to excessive proctoring violations.',
+        message: 'Assessment terminated due to excessive proctoring violations.',
         isTerminated: true,
         violationCount: sessionDoc.violationCount,
       });
@@ -242,7 +254,7 @@ router.post('/violation', authMiddleware, async (req, res) => {
     sessionDoc.violationCount += 1;
     sessionDoc.violations.push({ type, timestamp: new Date() });
 
-    const isTerminated = sessionDoc.violationCount > 3;
+    const isTerminated = sessionDoc.violationCount > 5;
     if (isTerminated) {
       sessionDoc.status = 'terminated';
       sessionDoc.terminationReason = 'excessive_violations';
@@ -306,7 +318,7 @@ router.get('/next', authMiddleware, async (req, res) => {
     const sessionConcept = sessionDoc?.concept || queryConcept;
     const maxQuestions = sessionMode === 'diagnostic' ? 10 : MAX_QUESTIONS_PER_SESSION;
 
-    if (sessionDoc && sessionDoc.status === 'terminated') {
+    if (sessionDoc && sessionDoc.status === 'terminated' && sessionDoc.terminationReason === 'excessive_violations') {
       return res.status(403).json({
         message: 'Assessment terminated due to excessive proctoring violations.',
         isTerminated: true,
@@ -498,7 +510,7 @@ router.post('/answer', authMiddleware, async (req, res) => {
 
     // 0. Proctoring Check
     const sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
-    if (sessionDoc && sessionDoc.status === 'terminated') {
+    if (sessionDoc && sessionDoc.status === 'terminated' && sessionDoc.terminationReason === 'excessive_violations') {
       return res.status(403).json({
         message: 'Assessment terminated due to excessive proctoring violations.',
         isTerminated: true,
