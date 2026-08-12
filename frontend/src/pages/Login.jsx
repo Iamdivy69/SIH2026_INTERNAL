@@ -107,7 +107,7 @@ export default function Login() {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
+                  placeholder="e.g. aksh@demo.com or divya@demo.com"
                   className="input"
                 />
               </div>
@@ -124,7 +124,7 @@ export default function Login() {
                   required
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="input"
                 />
               </div>

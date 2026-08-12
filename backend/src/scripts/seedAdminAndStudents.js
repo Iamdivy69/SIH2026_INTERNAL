@@ -14,6 +14,8 @@ const bcrypt   = require('bcryptjs');
 const User     = require('../models/User');
 const StudentConcept = require('../models/StudentConcept');
 
+const connectDB = require('../config/db');
+
 // All 8 canonical concepts with signup-default masteries
 const DEFAULT_MASTERY = {
   'Arrays':        72,
@@ -26,96 +28,112 @@ const DEFAULT_MASTERY = {
   'Dijkstra':      48,
 };
 
-// Mock students — only overridden concepts listed; rest use defaults
-const MOCK_STUDENTS = [
-  {
-    name: 'Priya Sharma',
-    email: 'priya@parakh.ai',
-    overrides: { BST: 25, AVL: 20, Arrays: 85, BFS: 70, Graphs: 65 },
-  },
-  {
-    name: 'Rahul Gupta',
-    email: 'rahul@parakh.ai',
-    overrides: { BST: 72, AVL: 68, Arrays: 55, BFS: 40, Graphs: 35 },
-  },
-  {
-    name: 'Ananya Singh',
-    email: 'ananya@parakh.ai',
-    overrides: { BST: 40, AVL: 35, Arrays: 60, BFS: 80, Graphs: 75 },
-  },
-  {
-    name: 'Dev Patel',
-    email: 'dev@parakh.ai',
-    overrides: { BST: 15, AVL: 10, Arrays: 90, BFS: 55, Graphs: 50 },
-  },
-  {
-    name: 'Demo Student',
-    email: 'demo@parakh.ai',
-    overrides: { BST: 43, AVL: 38, Arrays: 72, BFS: 60, Graphs: 55, Dijkstra: 48 },
-  },
-  {
-    name: 'Proctor Demo',
-    email: 'proctor_demo@parakh.ai',
-    overrides: { BST: 43, AVL: 38, Arrays: 72 },
-  },
-];
+const Response = require('../models/Response');
+const Question = require('../models/Question');
 
-const SEED_EMAILS = [
-  'admin@parakh.ai',
-  ...MOCK_STUDENTS.map(s => s.email),
+// Mock students with distinct mastery profiles
+const TARGET_USERS = [
+  {
+    name: 'Aksh',
+    email: 'aksh@demo.com',
+    password: 'Aksh@123',
+    role: 'admin',
+  },
+  {
+    name: 'Divya',
+    email: 'divya@demo.com',
+    password: 'Divya@123',
+    role: 'student',
+    hasCompletedDiagnostic: true,
+    overrides: {
+      'Arrays': 88,
+      'Linked Lists': 82,
+      'Binary Trees': 75,
+      'BST': 70,
+      'AVL': 64,
+      'Graphs': 50,
+      'BFS': 45,
+      'Dijkstra': 38,
+    },
+  },
+  {
+    name: 'Lakshmi',
+    email: 'lakshmi@demo.com',
+    password: 'Lakshmi@123',
+    role: 'student',
+    hasCompletedDiagnostic: true,
+    overrides: {
+      'BFS': 90,
+      'Graphs': 85,
+      'Dijkstra': 78,
+      'Arrays': 65,
+      'Linked Lists': 58,
+      'Binary Trees': 48,
+      'BST': 32,
+      'AVL': 25,
+    },
+  },
 ];
 
 async function seed() {
   try {
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGO_URI);
-      console.log('✅ Connected to MongoDB');
+      await connectDB();
     }
 
-    // Remove existing seeded accounts (idempotent)
-    const existingUsers = await User.find({ email: { $in: SEED_EMAILS } });
-    if (existingUsers.length > 0) {
-      const ids = existingUsers.map(u => u._id);
-      await StudentConcept.deleteMany({ userId: { $in: ids } });
-      await User.deleteMany({ _id: { $in: ids } });
-      console.log(`🗑  Removed ${existingUsers.length} existing seeded accounts`);
-    }
+    // Delete ALL existing users, responses & student concepts
+    await Response.deleteMany({});
+    const deletedConcepts = await StudentConcept.deleteMany({});
+    const deletedUsers = await User.deleteMany({});
+    console.log(`🗑  Deleted ALL existing users (${deletedUsers.deletedCount}) and student concept data (${deletedConcepts.deletedCount})`);
 
-    // Create admin
-    const adminHash = await bcrypt.hash('admin123', 10);
-    const admin = await User.create({
-      name: 'Admin',
-      email: 'admin@parakh.ai',
-      passwordHash: adminHash,
-      role: 'admin',
-    });
-    console.log(`✅ Admin created: admin@parakh.ai / admin123`);
+    const sampleQuestions = await Question.find({}).limit(10).lean();
 
-    // Create mock students with overridden mastery
-    const password = await bcrypt.hash('student123', 10);
-    for (const s of MOCK_STUDENTS) {
+    // Create target accounts
+    for (const u of TARGET_USERS) {
+      const passwordHash = await bcrypt.hash(u.password, 10);
       const user = await User.create({
-        name: s.name,
-        email: s.email,
-        passwordHash: password,
-        role: 'student',
+        name: u.name,
+        email: u.email,
+        passwordHash,
+        role: u.role,
+        hasCompletedDiagnostic: u.hasCompletedDiagnostic ?? true,
       });
 
-      // Merge defaults with overrides
-      const masteryMap = { ...DEFAULT_MASTERY, ...s.overrides };
-      const conceptDocs = Object.entries(masteryMap).map(([concept, mastery]) => ({
-        userId: user._id,
-        concept,
-        mastery,
-        abilityRating: 1100 + (mastery - 50) * 8, // Fix #1: inverse mapping backfill
-      }));
-      await StudentConcept.insertMany(conceptDocs);
-      console.log(`✅ ${s.name} (${s.email}) — BST: ${masteryMap.BST}% (Elo ${1100 + (masteryMap.BST - 50) * 8}), AVL: ${masteryMap.AVL}% (Elo ${1100 + (masteryMap.AVL - 50) * 8})`);
+      if (u.role === 'student') {
+        const masteryMap = { ...DEFAULT_MASTERY, ...(u.overrides || {}) };
+        const conceptDocs = Object.entries(masteryMap).map(([concept, mastery]) => ({
+          userId: user._id,
+          concept,
+          mastery,
+          abilityRating: 1100 + (mastery - 50) * 8,
+        }));
+        await StudentConcept.insertMany(conceptDocs);
+
+        // Seed distinct sample response history
+        if (sampleQuestions.length > 0) {
+          const isHighPerformer = u.name === 'Divya';
+          const sampleResponses = sampleQuestions.map((q, idx) => ({
+            userId: user._id,
+            questionId: q._id,
+            concept: q.concept,
+            difficulty: q.difficulty || 1,
+            isCorrect: isHighPerformer ? (idx % 4 !== 0) : (idx % 3 === 0),
+            timeSpent: 15 + idx * 3,
+            sessionId: `demo_seed_${user._id}_${idx}`,
+          }));
+          await Response.insertMany(sampleResponses);
+        }
+
+        console.log(`✅ Student created: ${u.name} (${u.email}) / ${u.password} (Diagnostic: ${user.hasCompletedDiagnostic})`);
+      } else {
+        console.log(`✅ Admin created: ${u.name} (${u.email}) / ${u.password}`);
+      }
     }
 
     // Print gap summary
-    console.log('\n📊 Concept gap summary across all students (incl. admin):');
-    const all = await StudentConcept.find({ userId: { $ne: admin._id } }).lean();
+    console.log('\n📊 Concept gap summary across all students:');
+    const all = await StudentConcept.find({}).lean();
     const byConceptAll = {};
     all.forEach(c => {
       if (!byConceptAll[c.concept]) byConceptAll[c.concept] = [];
