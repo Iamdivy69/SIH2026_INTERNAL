@@ -105,7 +105,7 @@ export default function Login() {
                   required
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="e.g. aksh@demo.com or divya@demo.com"
+                  placeholder="Enter your email address"
                   className="input"
                 />
               </div>

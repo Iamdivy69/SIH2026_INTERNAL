@@ -120,7 +120,7 @@ export default function Signup() {
                   autoComplete="name"
                   value={form.name}
                   onChange={handleChange}
-                  placeholder="Enter your full name (e.g. Divya Patel)"
+                  placeholder="Enter your full name"
                   className="input"
                   style={errors.name ? { borderColor: '#ef4444' } : {}}
                 />
@@ -138,7 +138,7 @@ export default function Signup() {
                   autoComplete="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="name@example.com"
+                  placeholder="Enter your email address"
                   className="input"
                   style={errors.email ? { borderColor: '#ef4444' } : {}}
                 />
@@ -156,7 +156,7 @@ export default function Signup() {
                   autoComplete="new-password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="Create a password (min. 6 characters)"
+                  placeholder="Enter your password"
                   className="input"
                   style={errors.password ? { borderColor: '#ef4444' } : {}}
                 />
