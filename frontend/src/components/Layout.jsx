@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,8 +29,12 @@ export default function Layout({ children }) {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isAssessment = location.pathname === '/assessment';
 
   const handleLogout = () => {
+    if (isAssessment) return;
     logout();
     navigate('/login');
   };
@@ -42,64 +46,66 @@ export default function Layout({ children }) {
       <div className="pointer-events-none fixed top-1/3 -left-32 h-[400px] w-[400px] rounded-full bg-[#0038A8]/10 dark:bg-[#004CE5]/15 blur-[100px] animate-blob-2" />
       <div className="pointer-events-none fixed -bottom-24 right-1/4 h-[420px] w-[420px] rounded-full bg-[#004CE5]/10 dark:bg-[#0038A8]/15 blur-[100px] animate-blob-3" />
 
-      <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#0F1525]/80 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between gap-4">
-            <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-[#004CE5] flex items-center justify-center shadow-sm">
-                <span className="text-white text-sm font-bold">P</span>
-              </div>
-              <span className="font-bold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
-            </NavLink>
-
-            {user && (
-              <nav className="hidden md:flex items-center gap-1">
-                {navItems.map(({ to, label }) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    className={({ isActive }) =>
-                      `nav-link ${isActive ? 'active' : ''}`
-                    }
-                  >
-                    {label}
-                  </NavLink>
-                ))}
-                {user.role === 'admin' && (
-                  <NavLink
-                    to="/admin"
-                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                  >
-                    Admin
-                  </NavLink>
-                )}
-              </nav>
-            )}
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleTheme}
-                aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-                className="btn-ghost p-2"
-              >
-                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-              </button>
+      {!isAssessment && (
+        <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#0F1525]/80 transition-colors duration-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 items-center justify-between gap-4">
+              <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-[#004CE5] flex items-center justify-center shadow-sm">
+                  <span className="text-white text-sm font-bold">P</span>
+                </div>
+                <span className="font-bold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
+              </NavLink>
 
               {user && (
-                <>
-                  <div className="hidden sm:flex flex-col items-end">
-                    <span className="text-sm font-medium text-black dark:text-[#F3F4F6] leading-tight">{user.name}</span>
-                    <span className="text-xs text-[#64748B] dark:text-[#94A3B8] capitalize">{user.role}</span>
-                  </div>
-                  <button onClick={handleLogout} className="btn-ghost text-xs px-3 py-1.5">
-                    Logout
-                  </button>
-                </>
+                <nav className="hidden md:flex items-center gap-1">
+                  {navItems.map(({ to, label }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      className={({ isActive }) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                      }
+                    >
+                      {label}
+                    </NavLink>
+                  ))}
+                  {user.role === 'admin' && (
+                    <NavLink
+                      to="/admin"
+                      className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                    >
+                      Admin
+                    </NavLink>
+                  )}
+                </nav>
               )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleTheme}
+                  aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                  className="btn-ghost p-2"
+                >
+                  {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                </button>
+
+                {user && (
+                  <>
+                    <div className="hidden sm:flex flex-col items-end">
+                      <span className="text-sm font-medium text-black dark:text-[#F3F4F6] leading-tight">{user.name}</span>
+                      <span className="text-xs text-[#64748B] dark:text-[#94A3B8] capitalize">{user.role}</span>
+                    </div>
+                    <button onClick={handleLogout} className="btn-ghost text-xs px-3 py-1.5">
+                      Logout
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}

@@ -163,6 +163,32 @@ export default function Assessment() {
   const [showWarningModal, setShowWarningModal] = useState(false);
   const lastViolationRef = useRef(0);
   const isTerminatedRef  = useRef(false);
+  const [quitByUser, setQuitByUser]         = useState(false);
+
+  const handleQuit = async () => {
+    const confirmQuit = window.confirm(
+      "Are you sure you want to quit the test? This session will be terminated and no progress will be saved."
+    );
+    if (!confirmQuit) return;
+
+    try {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      isTerminatedRef.current = true;
+      await fetch(`${API}/api/assessment/quit`, {
+        method: 'POST',
+        headers: authHeader(),
+        body: JSON.stringify({ sessionId }),
+      });
+      setQuitByUser(true);
+      setState('terminated');
+    } catch (err) {
+      console.error('Error quitting assessment:', err);
+      setQuitByUser(true);
+      setState('terminated');
+    }
+  };
 
   useEffect(() => {
     fetch(`${API}/api/assessment/start`, {
@@ -354,9 +380,13 @@ export default function Assessment() {
           <div className="w-16 h-16 bg-[#fdeaea] dark:bg-[#2e0f0f] text-[#dc2626] dark:text-[#f87171] flex items-center justify-center text-2xl font-bold mx-auto">
             !
           </div>
-          <h1 className="text-xl font-bold text-[#dc2626] dark:text-[#f87171]">Assessment Terminated</h1>
+          <h1 className="text-xl font-bold text-[#dc2626] dark:text-[#f87171]">
+            {quitByUser ? 'Assessment Ended' : 'Assessment Terminated'}
+          </h1>
           <p className="text-sm leading-relaxed px-4 text-black dark:text-[#F3F4F6]">
-            Your assessment was terminated because <strong>4 proctoring violations</strong> (tab switches or window blurs) were recorded. No score or mastery changes from this session were saved.
+            {quitByUser
+              ? 'You have manually exited the assessment. No score or mastery changes from this session were saved.'
+              : 'Your assessment was terminated because 4 proctoring violations (tab switches or window blurs) were recorded. No score or mastery changes from this session were saved.'}
           </p>
           <div className="pt-2">
             <Link to="/dashboard" className="btn-primary inline-block text-sm px-6 py-2">
@@ -387,7 +417,15 @@ export default function Assessment() {
             Questions adapt to your knowledge level in real-time
           </p>
         </div>
-        <ProgressDots answered={questionsAnswered} total={TOTAL_QUESTIONS} />
+        <div className="flex flex-col items-end gap-2">
+          <ProgressDots answered={questionsAnswered} total={TOTAL_QUESTIONS} />
+          <button
+            onClick={handleQuit}
+            className="btn-ghost text-xs text-[#ef4444] dark:text-[#f87171] hover:bg-[#fdeaea] dark:hover:bg-[#2e0f0f] border border-[#ef4444]/20 rounded px-2.5 py-1"
+          >
+            Quit Test
+          </button>
+        </div>
       </div>
 
       {state === 'loading' && (

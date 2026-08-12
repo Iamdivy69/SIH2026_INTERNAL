@@ -163,6 +163,39 @@ router.post('/violation', authMiddleware, async (req, res) => {
   }
 });
 
+// ── POST /api/assessment/quit ────────────────────────────────────
+router.post('/quit', authMiddleware, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    const userId = req.user.id;
+
+    if (!sessionId) {
+      return res.status(400).json({ message: 'sessionId is required.' });
+    }
+
+    let sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
+    if (!sessionDoc) {
+      sessionDoc = await AssessmentSession.create({
+        userId,
+        sessionId,
+        status: 'terminated',
+        terminationReason: 'user_quit',
+        violationCount: 0,
+        violations: [],
+      });
+    } else {
+      sessionDoc.status = 'terminated';
+      sessionDoc.terminationReason = 'user_quit';
+      await sessionDoc.save();
+    }
+
+    return res.json({ message: 'Assessment session quit successfully.', session: sessionDoc });
+  } catch (err) {
+    console.error('POST /api/assessment/quit error:', err);
+    return res.status(500).json({ message: 'Server error quitting assessment session.' });
+  }
+});
+
 // ── GET /api/assessment/next?sessionId=xxx ───────────────────────
 router.get('/next', authMiddleware, async (req, res) => {
   try {
