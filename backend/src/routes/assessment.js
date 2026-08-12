@@ -324,14 +324,22 @@ router.get('/next', authMiddleware, async (req, res) => {
       lastWasIncorrect = !!(lastResponse && !lastResponse.isCorrect);
 
     } else {
-      // Adaptive mode: standard weakest-concept-first behavior
+      // Adaptive mode: mix of topics prioritized by lowest mastery
       const sortedConcepts = [...allConcepts].sort((a, b) => a.mastery - b.mastery);
+      const validConceptDocs = [];
 
-      for (const conceptDoc of sortedConcepts) {
+      for (const cDoc of sortedConcepts) {
+        const countInBank = await Question.countDocuments({ concept: cDoc.concept });
+        if (countInBank > 0) {
+          validConceptDocs.push(cDoc);
+        }
+      }
+
+      if (validConceptDocs.length > 0) {
+        // Rotate concept based on question index to ensure a diverse mix of topics
+        const conceptIndex = answeredCount % validConceptDocs.length;
+        const conceptDoc = validConceptDocs[conceptIndex];
         const { concept } = conceptDoc;
-
-        const totalInBank = await Question.countDocuments({ concept });
-        if (totalInBank === 0) continue;
 
         const unserved = await Question.find({
           concept,
@@ -339,9 +347,7 @@ router.get('/next', authMiddleware, async (req, res) => {
         }).lean();
 
         if (unserved.length === 0) {
-          const allConceptQs = await Question.find({ concept }).lean();
-          if (allConceptQs.length === 0) continue;
-          candidateQuestions = allConceptQs;
+          candidateQuestions = await Question.find({ concept }).lean();
         } else {
           candidateQuestions = unserved;
         }
@@ -353,7 +359,6 @@ router.get('/next', authMiddleware, async (req, res) => {
         targetConceptDoc = conceptDoc;
         consecutiveCorrect = streak;
         lastWasIncorrect = !!wasIncorrect;
-        break;
       }
     }
 
