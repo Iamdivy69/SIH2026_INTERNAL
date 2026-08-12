@@ -484,20 +484,10 @@ export default function Assessment() {
       try { refreshUser(); } catch { /* ignore */ }
     }
 
-    setTimeout(() => {
-      navigate(path, navState ? { state: navState } : undefined);
-    }, 50);
+    navigate(path, navState ? { state: navState } : undefined);
   }, [navigate, refreshUser]);
 
-  // Auto-transition to results page after displaying final question feedback for 2.2s
-  useEffect(() => {
-    if (state === 'revealing' && questionsAnswered >= totalQuestions && totalQuestions > 0) {
-      const timer = setTimeout(() => {
-        handleCompleteNavigation('/assessment/results', { sessionId, mode });
-      }, 2200);
-      return () => clearTimeout(timer);
-    }
-  }, [state, questionsAnswered, totalQuestions, sessionId, mode, handleCompleteNavigation]);
+
 
   const handleNext = () => {
     if (questionsAnswered >= totalQuestions) {
