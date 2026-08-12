@@ -88,14 +88,18 @@ function buildReason({ concept, mastery, abilityRating, consecutiveCorrect, last
 router.get('/current', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
+
+    // Clean up stale sessions (> 2 hours old)
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    await AssessmentSession.updateMany(
+      { userId, status: 'in_progress', createdAt: { $lt: twoHoursAgo } },
+      { $set: { status: 'terminated', terminationReason: 'stale_timeout' } }
+    );
+
     const activeSessions = await AssessmentSession.find({ userId, status: 'in_progress' }).sort({ createdAt: -1 });
 
     if (!activeSessions.length) {
       return res.json({ inProgress: false, session: null });
-    }
-
-    if (activeSessions.length > 1) {
-      console.warn(`⚠️ User ${userId} has ${activeSessions.length} active in_progress sessions! Returning latest: ${activeSessions[0].sessionId}`);
     }
 
     return res.json({ inProgress: true, session: activeSessions[0] });
@@ -115,18 +119,21 @@ router.post('/start', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: 'sessionId is required.' });
     }
 
-    let sessionDoc = await AssessmentSession.findOne({ sessionId });
-    if (!sessionDoc) {
-      sessionDoc = await AssessmentSession.create({
-        userId,
-        sessionId,
-        mode,
-        concept,
-        status: 'in_progress',
-        violationCount: 0,
-        violations: [],
-      });
-    }
+    // Terminate any previous lingering in_progress sessions for this user
+    await AssessmentSession.updateMany(
+      { userId, status: 'in_progress' },
+      { $set: { status: 'terminated', terminationReason: 'new_session_started' } }
+    );
+
+    const sessionDoc = await AssessmentSession.create({
+      userId,
+      sessionId,
+      mode,
+      concept,
+      status: 'in_progress',
+      violationCount: 0,
+      violations: [],
+    });
 
     return res.status(201).json({ session: sessionDoc });
   } catch (err) {
@@ -192,27 +199,21 @@ router.post('/quit', authMiddleware, async (req, res) => {
     const { sessionId } = req.body;
     const userId = req.user.id;
 
-    if (!sessionId) {
-      return res.status(400).json({ message: 'sessionId is required.' });
+    // Terminate target session AND any lingering in_progress sessions for this user
+    await AssessmentSession.updateMany(
+      { userId, status: 'in_progress' },
+      { $set: { status: 'terminated', terminationReason: 'user_quit' } }
+    );
+
+    if (sessionId) {
+      await AssessmentSession.findOneAndUpdate(
+        { sessionId, userId },
+        { $set: { status: 'terminated', terminationReason: 'user_quit' } },
+        { upsert: true }
+      );
     }
 
-    let sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
-    if (!sessionDoc) {
-      sessionDoc = await AssessmentSession.create({
-        userId,
-        sessionId,
-        status: 'terminated',
-        terminationReason: 'user_quit',
-        violationCount: 0,
-        violations: [],
-      });
-    } else {
-      sessionDoc.status = 'terminated';
-      sessionDoc.terminationReason = 'user_quit';
-      await sessionDoc.save();
-    }
-
-    return res.json({ message: 'Assessment session quit successfully.', session: sessionDoc });
+    return res.json({ message: 'Assessment session quit successfully.' });
   } catch (err) {
     console.error('POST /api/assessment/quit error:', err);
     return res.status(500).json({ message: 'Server error quitting assessment session.' });
