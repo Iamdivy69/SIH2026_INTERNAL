@@ -1,0 +1,44 @@
+# Render Blueprint Specification (render.yaml)
+# Single Infrastructure-as-Code configuration for Backend & Frontend deployment
+services:
+  # 1. Backend API Service
+  - type: web
+    name: parakh-ai-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: LLM_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: parakh-ai-frontend
+          property: url
+
+  # 2. Frontend SPA Static Site
+  - type: web
+    name: parakh-ai-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: parakh-ai-backend
+          property: url

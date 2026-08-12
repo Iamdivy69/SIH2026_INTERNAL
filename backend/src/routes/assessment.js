@@ -84,10 +84,31 @@ function buildReason({ concept, mastery, abilityRating, consecutiveCorrect, last
   return `${eloTag} · Strong area: high difficulty mastery problem`;
 }
 
+// ── GET /api/assessment/current ──────────────────────────────────
+router.get('/current', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const activeSessions = await AssessmentSession.find({ userId, status: 'in_progress' }).sort({ createdAt: -1 });
+
+    if (!activeSessions.length) {
+      return res.json({ inProgress: false, session: null });
+    }
+
+    if (activeSessions.length > 1) {
+      console.warn(`⚠️ User ${userId} has ${activeSessions.length} active in_progress sessions! Returning latest: ${activeSessions[0].sessionId}`);
+    }
+
+    return res.json({ inProgress: true, session: activeSessions[0] });
+  } catch (err) {
+    console.error('GET /api/assessment/current error:', err);
+    return res.status(500).json({ message: 'Server error checking current session.' });
+  }
+});
+
 // ── POST /api/assessment/start ────────────────────────────────────
 router.post('/start', authMiddleware, async (req, res) => {
   try {
-    const { sessionId } = req.body;
+    const { sessionId, mode = 'adaptive', concept } = req.body;
     const userId = req.user.id;
 
     if (!sessionId) {
@@ -99,6 +120,8 @@ router.post('/start', authMiddleware, async (req, res) => {
       sessionDoc = await AssessmentSession.create({
         userId,
         sessionId,
+        mode,
+        concept,
         status: 'in_progress',
         violationCount: 0,
         violations: [],
@@ -199,15 +222,21 @@ router.post('/quit', authMiddleware, async (req, res) => {
 // ── GET /api/assessment/next?sessionId=xxx ───────────────────────
 router.get('/next', authMiddleware, async (req, res) => {
   try {
-    const { sessionId } = req.query;
+    const { sessionId, mode: queryMode, concept: queryConcept } = req.query;
     if (!sessionId) {
       return res.status(400).json({ message: 'sessionId query param is required.' });
     }
 
     const userId = req.user.id;
 
-    // 0. Proctoring Check
-    const sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
+    // 0. Proctoring & Session Check
+    let sessionDoc = await AssessmentSession.findOne({ sessionId, userId });
+
+    // Determine mode & concept from authoritative sessionDoc or query fallback
+    const sessionMode = sessionDoc?.mode || queryMode || 'adaptive';
+    const sessionConcept = sessionDoc?.concept || queryConcept;
+    const maxQuestions = sessionMode === 'diagnostic' ? 10 : MAX_QUESTIONS_PER_SESSION;
+
     if (sessionDoc && sessionDoc.status === 'terminated') {
       return res.status(403).json({
         message: 'Assessment terminated due to excessive proctoring violations.',
@@ -218,13 +247,18 @@ router.get('/next', authMiddleware, async (req, res) => {
 
     // 1. Session Complete Check
     const answeredCount = await getSessionAnswerCount(userId, sessionId);
-    if (answeredCount >= MAX_QUESTIONS_PER_SESSION) {
+    if (answeredCount >= maxQuestions) {
       if (sessionDoc && sessionDoc.status !== 'completed') {
         sessionDoc.status = 'completed';
         sessionDoc.completedAt = new Date();
         await sessionDoc.save();
+
+        if (sessionMode === 'diagnostic') {
+          const User = require('../models/User');
+          await User.findByIdAndUpdate(userId, { hasCompletedDiagnostic: true });
+        }
       }
-      return res.status(200).json({ done: true, questionsAnswered: answeredCount });
+      return res.status(200).json({ done: true, questionsAnswered: answeredCount, totalQuestions: maxQuestions });
     }
 
     // 2. Read StudentConcept rows for user
@@ -239,55 +273,97 @@ router.get('/next', authMiddleware, async (req, res) => {
       try { return require('mongoose').Types.ObjectId.createFromHexString(id); } catch { return null; }
     }).filter(Boolean);
 
-    // 4. Select target concept (weakest first with available unserved questions)
-    const sortedConcepts = [...allConcepts].sort((a, b) => a.mastery - b.mastery);
-
+    // 4. Select target concept based on mode
     let targetConceptDoc = null;
     let consecutiveCorrect = 0;
     let lastWasIncorrect = false;
     let candidateQuestions = [];
 
-    for (const conceptDoc of sortedConcepts) {
-      const { concept } = conceptDoc;
+    const CANONICAL_CONCEPTS = [
+      'Arrays', 'Linked Lists', 'Binary Trees', 'BST',
+      'AVL', 'Graphs', 'BFS', 'Dijkstra'
+    ];
 
-      // Fast Inventory Guard: check if total questions exist in bank
-      const totalInBank = await Question.countDocuments({ concept });
-      if (totalInBank === 0) continue;
+    if (sessionMode === 'diagnostic') {
+      // Diagnostic mode: cycle round-robin through all 8 concepts
+      const targetConceptName = CANONICAL_CONCEPTS[answeredCount % CANONICAL_CONCEPTS.length];
+      targetConceptDoc = allConcepts.find(c => c.concept === targetConceptName) || { concept: targetConceptName, mastery: 50, abilityRating: 1100 };
 
-      // Find unserved questions for this user in lifetime history
       const unserved = await Question.find({
-        concept,
+        concept: targetConceptName,
         _id: { $nin: objectIdExclusions },
       }).lean();
 
       if (unserved.length === 0) {
-        // Fallback: if lifetime exclusion exhausts concept pool, relax to all questions for concept
-        const allConceptQs = await Question.find({ concept }).lean();
-        if (allConceptQs.length === 0) continue;
-        candidateQuestions = allConceptQs;
+        candidateQuestions = await Question.find({ concept: targetConceptName }).lean();
       } else {
         candidateQuestions = unserved;
       }
+      consecutiveCorrect = await getConsecutiveCorrect(userId, sessionId, targetConceptName);
+      const lastResponse = await getLastResponseForConcept(userId, sessionId, targetConceptName);
+      lastWasIncorrect = !!(lastResponse && !lastResponse.isCorrect);
 
-      const streak = await getConsecutiveCorrect(userId, sessionId, concept);
-      const lastResponse = await getLastResponseForConcept(userId, sessionId, concept);
-      const wasIncorrect = lastResponse && !lastResponse.isCorrect;
+    } else if (sessionMode === 'targeted' && sessionConcept) {
+      // Targeted mode: restrict selection strictly to specified concept
+      const targetConceptName = sessionConcept;
+      targetConceptDoc = allConcepts.find(c => c.concept === targetConceptName) || { concept: targetConceptName, mastery: 50, abilityRating: 1100 };
 
-      targetConceptDoc = conceptDoc;
-      consecutiveCorrect = streak;
-      lastWasIncorrect = !!wasIncorrect;
-      break;
+      const unserved = await Question.find({
+        concept: targetConceptName,
+        _id: { $nin: objectIdExclusions },
+      }).lean();
+
+      if (unserved.length === 0) {
+        candidateQuestions = await Question.find({ concept: targetConceptName }).lean();
+      } else {
+        candidateQuestions = unserved;
+      }
+      consecutiveCorrect = await getConsecutiveCorrect(userId, sessionId, targetConceptName);
+      const lastResponse = await getLastResponseForConcept(userId, sessionId, targetConceptName);
+      lastWasIncorrect = !!(lastResponse && !lastResponse.isCorrect);
+
+    } else {
+      // Adaptive mode: standard weakest-concept-first behavior
+      const sortedConcepts = [...allConcepts].sort((a, b) => a.mastery - b.mastery);
+
+      for (const conceptDoc of sortedConcepts) {
+        const { concept } = conceptDoc;
+
+        const totalInBank = await Question.countDocuments({ concept });
+        if (totalInBank === 0) continue;
+
+        const unserved = await Question.find({
+          concept,
+          _id: { $nin: objectIdExclusions },
+        }).lean();
+
+        if (unserved.length === 0) {
+          const allConceptQs = await Question.find({ concept }).lean();
+          if (allConceptQs.length === 0) continue;
+          candidateQuestions = allConceptQs;
+        } else {
+          candidateQuestions = unserved;
+        }
+
+        const streak = await getConsecutiveCorrect(userId, sessionId, concept);
+        const lastResponse = await getLastResponseForConcept(userId, sessionId, concept);
+        const wasIncorrect = lastResponse && !lastResponse.isCorrect;
+
+        targetConceptDoc = conceptDoc;
+        consecutiveCorrect = streak;
+        lastWasIncorrect = !!wasIncorrect;
+        break;
+      }
     }
 
     if (!targetConceptDoc || candidateQuestions.length === 0) {
-      return res.status(200).json({ done: true, questionsAnswered: answeredCount });
+      return res.status(200).json({ done: true, questionsAnswered: answeredCount, totalQuestions: maxQuestions });
     }
 
     const { concept, mastery, abilityRating } = targetConceptDoc;
     const studentElo = abilityRating || (1100 + (mastery - 50) * 8);
 
     // 5. Phase 12 Candidate Scoring & Top-N Selection
-    // Score = ratingGap + (exposurePenalty * 150)
     const scoredCandidates = candidateQuestions.map(q => {
       const qElo = q.eloRating || (q.difficulty === 1 ? 1000 : q.difficulty === 2 ? 1250 : 1500);
       const ratingGap = Math.abs(qElo - studentElo);
@@ -297,10 +373,8 @@ router.get('/next', authMiddleware, async (req, res) => {
       return { question: q, score };
     });
 
-    // Sort by score ascending (best Elo + exposure match first)
     scoredCandidates.sort((a, b) => a.score - b.score);
 
-    // Safe Top-N Selection (Fix #4: Math.min(3, candidates.length))
     const topNCount = Math.min(3, scoredCandidates.length);
     const selectedPair = scoredCandidates[Math.floor(Math.random() * topNCount)];
     const question = selectedPair.question;
@@ -317,6 +391,7 @@ router.get('/next', authMiddleware, async (req, res) => {
       targetDifficulty: question.difficulty,
       consecutiveCorrect,
       isReinforcement,
+      mode: sessionMode,
       reason: buildReason({ concept, mastery, abilityRating: studentElo, consecutiveCorrect, lastWasIncorrect, isReinforcement }),
     };
 
@@ -327,7 +402,9 @@ router.get('/next', authMiddleware, async (req, res) => {
       question: questionSafe,
       reasoning,
       questionsAnswered: answeredCount,
-      totalQuestions: MAX_QUESTIONS_PER_SESSION,
+      totalQuestions: maxQuestions,
+      mode: sessionMode,
+      concept: sessionConcept,
     });
   } catch (err) {
     console.error('GET /api/assessment/next error:', err);
@@ -355,6 +432,9 @@ router.post('/answer', authMiddleware, async (req, res) => {
       });
     }
 
+    const sessionMode = sessionDoc?.mode || 'adaptive';
+    const maxQuestions = sessionMode === 'diagnostic' ? 10 : MAX_QUESTIONS_PER_SESSION;
+
     // 1. Fetch Question
     const question = await Question.findById(questionId);
     if (!question) {
@@ -364,9 +444,14 @@ router.post('/answer', authMiddleware, async (req, res) => {
     const isCorrect = selectedAnswer === question.correctAnswer;
 
     // 2. Fetch StudentConcept
-    const conceptDoc = await StudentConcept.findOne({ userId, concept: question.concept });
+    let conceptDoc = await StudentConcept.findOne({ userId, concept: question.concept });
     if (!conceptDoc) {
-      return res.status(404).json({ message: `No StudentConcept found for concept: ${question.concept}` });
+      conceptDoc = await StudentConcept.create({
+        userId,
+        concept: question.concept,
+        mastery: 50,
+        abilityRating: 1100,
+      });
     }
 
     // 3. Phase 12 Paired Elo Rating Calculation
@@ -379,7 +464,6 @@ router.post('/answer', authMiddleware, async (req, res) => {
     const newStudentElo  = Math.round(sElo + K_STUDENT * (actualScore - expected));
     const newQuestionElo = Math.round(qElo + K_QUESTION * (expected - actualScore));
 
-    // Map student Elo to visible mastery display (0–100 scale)
     const newMastery = Math.max(0, Math.min(100, Math.round(50 + (newStudentElo - 1100) / 8)));
     const masteryChange = newMastery - conceptDoc.mastery;
 
@@ -418,12 +502,17 @@ router.post('/answer', authMiddleware, async (req, res) => {
 
     // 6. Check Session Completion
     const questionsAnswered = await getSessionAnswerCount(userId, sessionId);
-    const done = questionsAnswered >= MAX_QUESTIONS_PER_SESSION;
+    const done = questionsAnswered >= maxQuestions;
 
     if (done && sessionDoc && sessionDoc.status !== 'completed') {
       sessionDoc.status = 'completed';
       sessionDoc.completedAt = new Date();
       await sessionDoc.save();
+
+      if (sessionMode === 'diagnostic') {
+        const User = require('../models/User');
+        await User.findByIdAndUpdate(userId, { hasCompletedDiagnostic: true });
+      }
     }
 
     return res.json({
@@ -435,6 +524,7 @@ router.post('/answer', authMiddleware, async (req, res) => {
       updatedAbilityRating: newStudentElo,
       updatedQuestionElo: newQuestionElo,
       questionsAnswered,
+      totalQuestions: maxQuestions,
       done,
     });
   } catch (err) {

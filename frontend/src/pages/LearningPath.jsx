@@ -187,10 +187,13 @@ export default function LearningPath() {
                       </div>
                     </div>
 
-                    {status === 'current' && (
+                    {(status === 'current' || status === 'done') && (
                       <div className="mt-3 text-right">
-                        <Link to="/assessment" className="btn-primary text-xs px-3 py-1.5 inline-block">
-                          Start Assessment
+                        <Link
+                          to={`/assessment?mode=targeted&concept=${encodeURIComponent(mod.concept)}`}
+                          className="btn-primary text-xs px-3 py-1.5 inline-block"
+                        >
+                          Practice {mod.concept}
                         </Link>
                       </div>
                     )}
@@ -242,8 +245,11 @@ export default function LearningPath() {
             </div>
 
             {getModuleStatus(ROADMAP_MODULES.findIndex(m => m.id === selectedMod.id), masteryMap) !== 'locked' ? (
-              <Link to="/assessment" className="btn-primary w-full text-center block">
-                Start Assessment (targets weakest concept)
+              <Link
+                to={`/assessment?mode=targeted&concept=${encodeURIComponent(selectedMod.concept)}`}
+                className="btn-primary w-full text-center block"
+              >
+                Practice {selectedMod.concept}
               </Link>
             ) : (
               <div className="text-center p-3 bg-[#F8FAFF] dark:bg-[#0D1325] text-[#64748B] dark:text-[#94A3B8] text-xs italic">

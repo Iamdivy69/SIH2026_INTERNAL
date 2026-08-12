@@ -9,6 +9,7 @@
     "seed:questions": "node src/scripts/seedQuestions.js",
     "seed:admin": "node src/scripts/seedAdminAndStudents.js",
     "seed:bulk": "node src/scripts/bulkGenerateQuestions.js",
+    "seed:all": "node src/scripts/seedAllDemoData.js",
     "warmup": "node src/scripts/warmupLLM.js"
   },
   "keywords": [],
@@ -25,6 +26,7 @@
     "mongoose": "^8.4.4"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.4"
   }
 }

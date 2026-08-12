@@ -25,6 +25,14 @@ const assessmentSessionSchema = new mongoose.Schema({
     enum: ['in_progress', 'completed', 'terminated'],
     default: 'in_progress',
   },
+  mode: {
+    type: String,
+    enum: ['diagnostic', 'targeted', 'adaptive'],
+    default: 'adaptive',
+  },
+  concept: {
+    type: String,
+  },
   violationCount: {
     type: Number,
     default: 0,
@@ -33,7 +41,7 @@ const assessmentSessionSchema = new mongoose.Schema({
     {
       type: {
         type: String,
-        enum: ['tab_switch', 'fullscreen_exit', 'window_blur'],
+        enum: ['tab_switch', 'fullscreen_exit', 'window_blur', 'navigation_attempt'],
         required: true,
       },
       timestamp: {

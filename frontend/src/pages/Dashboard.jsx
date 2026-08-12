@@ -122,7 +122,24 @@ export default function Dashboard() {
         <StatCard label="Total Concepts"  value={concepts.length}      sub="being tracked" />
       </div>
 
-      {weakConcepts.length > 0 && (
+      {/* Diagnostic Card for First-Time Students */}
+      {!user?.hasCompletedDiagnostic ? (
+        <div className="card border-l-4 border-l-[#004CE5] bg-gradient-to-r from-[#E6F0FF]/60 to-transparent dark:from-[#0F1D3D]/60 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="chip chip-blue font-bold text-xs uppercase tracking-wider">Required First Step</span>
+              <span className="text-xs text-[#64748B] dark:text-[#94A3B8]">~10 Questions</span>
+            </div>
+            <h2 className="text-lg font-extrabold text-[#011A53] dark:text-[#8BB8FF]">Start Diagnostic Assessment</h2>
+            <p className="text-sm text-black dark:text-[#F3F4F6] max-w-xl">
+              Set your initial baseline knowledge profile across all 8 data structure concepts with our one-time diagnostic test.
+            </p>
+          </div>
+          <Link to="/assessment?mode=diagnostic" className="btn-primary shrink-0 px-6 py-2.5 font-bold shadow-md">
+            Begin Diagnostic Test &rarr;
+          </Link>
+        </div>
+      ) : weakConcepts.length > 0 ? (
         <div className="card border-l-4 border-l-[#ef4444] flex items-start gap-3">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-black dark:text-[#F3F4F6]">
@@ -133,11 +150,11 @@ export default function Dashboard() {
               Start an adaptive assessment to improve these concepts
             </p>
           </div>
-          <Link to="/assessment" className="btn-primary text-xs shrink-0">
+          <Link to="/assessment?mode=adaptive" className="btn-primary text-xs shrink-0">
             Start Assessment
           </Link>
         </div>
-      )}
+      ) : null}
 
       <div className="card space-y-5">
         <div className="flex items-center justify-between">
@@ -155,9 +172,9 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { to: '/assessment',    label: 'Take Assessment',  sub: 'Adaptive 7-question test',   type: 'assessment' },
-          { to: '/learning-path', label: 'Learning Path',    sub: 'Your personalized roadmap',  type: 'learning' },
-          { to: '/ai-tutor',      label: 'Ask AI Tutor',     sub: 'Get grounded explanations',  type: 'tutor' },
+          { to: user?.hasCompletedDiagnostic ? '/assessment?mode=adaptive' : '/assessment?mode=diagnostic', label: 'Take Assessment', sub: user?.hasCompletedDiagnostic ? 'Adaptive 7-question test' : 'Diagnostic baseline test', type: 'assessment' },
+          { to: '/learning-path', label: 'Learning Path', sub: 'Your personalized roadmap', type: 'learning' },
+          { to: '/ai-tutor', label: 'Ask AI Tutor', sub: 'Get grounded explanations', type: 'tutor' },
         ].map(({ to, label, sub, type }) => (
           <Link key={to} to={to} className="card hover:border-[#004CE5] dark:hover:border-[#004CE5] transition-colors duration-200 block">
             <div className="mb-3">

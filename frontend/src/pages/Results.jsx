@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function buildInsight(concepts, weak, strong) {
@@ -77,6 +77,8 @@ function BucketCard({ label, count, concepts }) {
 
 export default function Results() {
   const { authHeader, API } = useAuth();
+  const location = useLocation();
+  const mode = location.state?.mode;
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -107,11 +109,17 @@ export default function Results() {
   const { concepts, overallMastery, strong, developing, weak } = data;
   const insight = buildInsight(concepts, weak, strong);
 
+  const isDiagnostic = mode === 'diagnostic';
+
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1>Assessment Complete</h1>
-        <p className="text-base text-[#64748B] dark:text-[#94A3B8]">Here&apos;s how your knowledge profile updated</p>
+        <h1>{isDiagnostic ? 'Your baseline is set' : 'Assessment Complete'}</h1>
+        <p className="text-base text-[#64748B] dark:text-[#94A3B8]">
+          {isDiagnostic
+            ? 'Your initial diagnostic profile has been generated across all 8 data structure concepts'
+            : 'Here\'s how your knowledge profile updated'}
+        </p>
       </div>
 
       <div className="card flex flex-col items-center gap-4 py-8">

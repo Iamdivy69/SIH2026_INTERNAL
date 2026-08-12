@@ -10,6 +10,7 @@
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
     "seed:questions": "npm run seed:questions --prefix backend",
     "seed:admin": "npm run seed:admin --prefix backend",
+    "seed:all": "npm run seed:all --prefix backend",
     "build": "npm run build --prefix frontend"
   },
   "keywords": [],

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 function DifficultyBadge({ level }) {
@@ -118,9 +118,9 @@ function ProgressDots({ answered, total }) {
 
 function ViolationModal({ count, onClose }) {
   const messages = {
-    1: 'Violation 1 of 3: Leaving or switching away from the test window is tracked. Two more will end your assessment.',
-    2: 'Violation 2 of 3: WARNING! Exiting fullscreen or changing tabs again will bring you to your final warning.',
-    3: 'Violation 3 of 3: FINAL WARNING! Leaving the screen one more time will terminate your assessment immediately with 0 score saved.',
+    1: 'Violation 1 of 3: Leaving or switching away from the test screen (back button, tab switch, window blur) is tracked. Two more will end your assessment.',
+    2: 'Violation 2 of 3: WARNING! Exiting fullscreen, changing tabs, or navigating away again will bring you to your final warning.',
+    3: 'Violation 3 of 3: FINAL WARNING! Leaving the test screen one more time will terminate your assessment immediately with 0 score saved.',
   };
 
   return (
@@ -141,20 +141,107 @@ function ViolationModal({ count, onClose }) {
   );
 }
 
-const TOTAL_QUESTIONS = 7;
+function PreTestRules({ mode, concept, onConfirm, onCancel }) {
+  const modeLabels = {
+    diagnostic: {
+      title: 'Diagnostic Baseline Assessment',
+      sub: '~10 questions round-robin across all 8 data structure concepts to set your starting knowledge profile.',
+      badge: 'Diagnostic Baseline',
+    },
+    targeted: {
+      title: `Targeted Practice: ${concept || 'Selected Subject'}`,
+      sub: `~7 questions focused exclusively on ${concept || 'the selected subject'}.`,
+      badge: 'Targeted Practice',
+    },
+    adaptive: {
+      title: 'Adaptive Assessment Session',
+      sub: '~7 questions that dynamically adapt to your real-time Elo knowledge rating.',
+      badge: 'Adaptive Proctored',
+    },
+  };
+
+  const info = modeLabels[mode] || modeLabels.adaptive;
+
+  return (
+    <div className="max-w-xl mx-auto my-6 space-y-6">
+      <div className="card border-l-4 border-l-[#004CE5] space-y-6 p-6 sm:p-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#004CE5] flex items-center justify-center font-bold text-xl">
+              🛡️
+            </div>
+            <div>
+              <span className="chip chip-blue text-xs font-semibold">{info.badge}</span>
+              <h1 className="text-xl font-extrabold text-black dark:text-[#F3F4F6] mt-0.5">{info.title}</h1>
+            </div>
+          </div>
+        </div>
+
+        <p className="text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
+          {info.sub}
+        </p>
+
+        <div className="p-4 rounded-xl bg-[#F8FAFF] dark:bg-[#0D1325] border border-[#E6F0FF] dark:border-[#1C2A4A] space-y-3">
+          <h2 className="text-sm font-bold text-[#011A53] dark:text-[#8BB8FF] flex items-center gap-2">
+            <span>📋</span> Proctoring Rules & System Monitoring
+          </h2>
+
+          <ul className="space-y-2.5 text-xs leading-relaxed text-black dark:text-[#F3F4F6]">
+            <li className="flex items-start gap-2">
+              <span className="text-[#004CE5] font-bold">•</span>
+              <span><strong>Full-Screen Lock:</strong> The assessment runs in proctored full-screen mode. Exiting full-screen mode is recorded as a violation.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#004CE5] font-bold">•</span>
+              <span><strong>Tab Switch & Window Focus:</strong> Switching browser tabs, opening other software, or shifting window focus is strictly monitored.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#004CE5] font-bold">•</span>
+              <span><strong>Navigation Lock:</strong> Clicking browser Back/Forward buttons or attempting to navigate to other pages during the test counts as a navigation violation.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[#dc2626] dark:text-[#f87171] font-bold">•</span>
+              <span><strong>Termination Penalty:</strong> Accumulating <strong>4 violations</strong> will immediately terminate your assessment with no score or mastery progress saved.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="pt-2 flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={onConfirm}
+            className="btn-primary flex-1 font-bold text-sm py-3 text-center"
+          >
+            I Understand & Start Assessment &rarr;
+          </button>
+          <button
+            onClick={onCancel}
+            className="btn-ghost text-xs px-4 py-2.5 text-[#64748B] dark:text-[#94A3B8] hover:text-black dark:hover:text-[#F3F4F6]"
+          >
+            Cancel & Return
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Assessment() {
-  const { authHeader, API } = useAuth();
+  const { authHeader, refreshUser, API } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const mode = searchParams.get('mode') || 'adaptive';
+  const conceptParam = searchParams.get('concept');
 
   const [sessionId] = useState(() => crypto.randomUUID());
 
-  const [state, setState]                   = useState('idle');
+  const [state, setState]                   = useState('rules');
   const [question, setQuestion]             = useState(null);
   const [reasoning, setReasoning]           = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [answerResult, setAnswerResult]     = useState(null);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
+  const [totalQuestions, setTotalQuestions]     = useState(() => (mode === 'diagnostic' ? 10 : 7));
   const [whyOpen, setWhyOpen]               = useState(true);
   const [transitionStep, setTransitionStep] = useState(0);
   const [error, setError]                   = useState('');
@@ -190,20 +277,8 @@ export default function Assessment() {
     }
   };
 
-  useEffect(() => {
-    fetch(`${API}/api/assessment/start`, {
-      method: 'POST',
-      headers: authHeader(),
-      body: JSON.stringify({ sessionId }),
-    }).catch(err => console.error('Start session error:', err));
-
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  }, [sessionId, API, authHeader]);
-
   const reportViolation = useCallback((type) => {
-    if (isTerminatedRef.current || state === 'done' || state === 'terminated') return;
+    if (isTerminatedRef.current || state === 'rules' || state === 'done' || state === 'terminated') return;
 
     const now = Date.now();
     if (now - lastViolationRef.current < 1000) return;
@@ -228,7 +303,10 @@ export default function Assessment() {
       .catch(err => console.error('Violation report error:', err));
   }, [sessionId, API, authHeader, state]);
 
+  // Handle visibility, fullscreen, blur, and popstate navigation attempts
   useEffect(() => {
+    if (state === 'rules') return;
+
     const handleVisibility = () => {
       if (document.hidden) reportViolation('tab_switch');
     };
@@ -241,14 +319,27 @@ export default function Assessment() {
       reportViolation('window_blur');
     };
 
+    // Lock browser back/forward buttons during test
+    if (state !== 'done' && state !== 'terminated') {
+      window.history.pushState(null, '', window.location.href);
+    }
+    const handlePopState = (e) => {
+      if (state !== 'done' && state !== 'terminated') {
+        window.history.pushState(null, '', window.location.href);
+        reportViolation('navigation_attempt');
+      }
+    };
+
     document.addEventListener('visibilitychange', handleVisibility);
     document.addEventListener('fullscreenchange', handleFullscreen);
     window.addEventListener('blur', handleBlur);
+    window.addEventListener('popstate', handlePopState);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       document.removeEventListener('fullscreenchange', handleFullscreen);
       window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('popstate', handlePopState);
     };
   }, [reportViolation, state]);
 
@@ -277,6 +368,10 @@ export default function Assessment() {
         return;
       }
 
+      if (data.totalQuestions) {
+        setTotalQuestions(data.totalQuestions);
+      }
+
       if (data.done) {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
@@ -295,15 +390,26 @@ export default function Assessment() {
     }
   }, [sessionId, API, authHeader]);
 
-  useEffect(() => {
+  const handleStartAssessment = () => {
+    fetch(`${API}/api/assessment/start`, {
+      method: 'POST',
+      headers: authHeader(),
+      body: JSON.stringify({ sessionId, mode, concept: conceptParam }),
+    }).catch(err => console.error('Start session error:', err));
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
     fetchNextQuestion();
-  }, [fetchNextQuestion]);
+  };
 
   useEffect(() => {
     if (state === 'done') {
-      setTimeout(() => navigate('/results', { state: { sessionId } }), 800);
+      if (typeof refreshUser === 'function') refreshUser();
+      setTimeout(() => navigate('/results', { state: { sessionId, mode } }), 800);
     }
-  }, [state, navigate, sessionId]);
+  }, [state, navigate, sessionId, mode, refreshUser]);
 
   const handleSubmit = async () => {
     if (selectedOption === null || !question || isTerminatedRef.current) return;
@@ -344,6 +450,7 @@ export default function Assessment() {
 
       setAnswerResult(data);
       setQuestionsAnswered(data.questionsAnswered);
+      if (data.totalQuestions) setTotalQuestions(data.totalQuestions);
 
       if (data.done) {
         if (document.fullscreenElement) {
@@ -373,6 +480,17 @@ export default function Assessment() {
 
   const isTransitioning = state === 'transitioning';
 
+  if (state === 'rules') {
+    return (
+      <PreTestRules
+        mode={mode}
+        concept={conceptParam}
+        onConfirm={handleStartAssessment}
+        onCancel={() => navigate('/dashboard')}
+      />
+    );
+  }
+
   if (state === 'terminated') {
     return (
       <div className="max-w-md mx-auto my-12 text-center space-y-6">
@@ -386,7 +504,7 @@ export default function Assessment() {
           <p className="text-sm leading-relaxed px-4 text-black dark:text-[#F3F4F6]">
             {quitByUser
               ? 'You have manually exited the assessment. No score or mastery changes from this session were saved.'
-              : 'Your assessment was terminated because 4 proctoring violations (tab switches or window blurs) were recorded. No score or mastery changes from this session were saved.'}
+              : 'Your assessment was terminated because 4 proctoring violations (tab switches, window blurs, or navigation attempts) were recorded. No score or mastery changes from this session were saved.'}
           </p>
           <div className="pt-2">
             <Link to="/dashboard" className="btn-primary inline-block text-sm px-6 py-2">
@@ -398,6 +516,22 @@ export default function Assessment() {
     );
   }
 
+  // Header Title & Badge formatting
+  const headerTitle =
+    mode === 'diagnostic' ? 'Diagnostic Assessment' :
+    mode === 'targeted' ? `Practice: ${conceptParam || question?.concept || 'Targeted'}` :
+    'Adaptive Practice';
+
+  const headerSub =
+    mode === 'diagnostic' ? 'One-time baseline setup across all 8 concepts' :
+    mode === 'targeted' ? `Focused practice questions on ${conceptParam || question?.concept || 'selected concept'}` :
+    'Questions adapt to your knowledge level in real-time';
+
+  const headerBadge =
+    mode === 'diagnostic' ? 'Diagnostic Baseline' :
+    mode === 'targeted' ? 'Targeted Practice' :
+    'Adaptive Proctored';
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {isTransitioning && <TransitionOverlay step={transitionStep} />}
@@ -408,17 +542,17 @@ export default function Assessment() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1>Adaptive Assessment</h1>
+            <h1 className="text-xl font-extrabold text-black dark:text-[#F3F4F6]">{headerTitle}</h1>
             <span className="chip chip-blue text-xs">
-              Proctored
+              {headerBadge}
             </span>
           </div>
           <p className="text-sm mt-0.5 text-[#64748B] dark:text-[#94A3B8]">
-            Questions adapt to your knowledge level in real-time
+            {headerSub}
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <ProgressDots answered={questionsAnswered} total={TOTAL_QUESTIONS} />
+          <ProgressDots answered={questionsAnswered} total={totalQuestions} />
           <button
             onClick={handleQuit}
             className="btn-ghost text-xs text-[#ef4444] dark:text-[#f87171] hover:bg-[#fdeaea] dark:hover:bg-[#2e0f0f] border border-[#ef4444]/20 rounded px-2.5 py-1"

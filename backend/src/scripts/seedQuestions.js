@@ -214,8 +214,10 @@ const questions = [
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ Connected to MongoDB');
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log('✅ Connected to MongoDB');
+    }
 
     // Clear existing questions (idempotent seed)
     const deleted = await Question.deleteMany({ source: 'seed' });
@@ -231,13 +233,20 @@ async function seed() {
     console.log(`   BST: ${bstCount} questions`);
     console.log(`   AVL: ${avlCount} questions`);
 
-    await mongoose.disconnect();
-    console.log('✅ Done');
-    process.exit(0);
+    if (require.main === module) {
+      await mongoose.disconnect();
+      console.log('✅ Done');
+      process.exit(0);
+    }
   } catch (err) {
     console.error('❌ Seed failed:', err.message);
-    process.exit(1);
+    if (require.main === module) process.exit(1);
+    throw err;
   }
 }
 
-seed();
+if (require.main === module) {
+  seed();
+}
+
+module.exports = seed;

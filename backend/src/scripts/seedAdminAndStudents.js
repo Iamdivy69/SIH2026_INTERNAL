@@ -67,8 +67,10 @@ const SEED_EMAILS = [
 
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ Connected to MongoDB');
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log('✅ Connected to MongoDB');
+    }
 
     // Remove existing seeded accounts (idempotent)
     const existingUsers = await User.find({ email: { $in: SEED_EMAILS } });
@@ -127,9 +129,11 @@ async function seed() {
       .sort((a, b) => a.avg - b.avg);
     sorted.forEach(({ concept, avg }) => console.log(`   ${concept}: avg ${avg}%`));
 
-    await mongoose.disconnect();
-    console.log('\n✅ Seed complete');
-    if (require.main === module) process.exit(0);
+    if (require.main === module) {
+      await mongoose.disconnect();
+      console.log('\n✅ Seed complete');
+      process.exit(0);
+    }
   } catch (err) {
     console.error('❌ Seed failed:', err);
     if (require.main === module) process.exit(1);

@@ -12,12 +12,23 @@ router.get('/state', authMiddleware, async (req, res) => {
     const userId = req.user.id;
 
     // All concept mastery rows
-    const concepts = await StudentConcept.find({ userId })
+    let concepts = await StudentConcept.find({ userId })
       .sort({ concept: 1 })
       .lean();
 
     if (!concepts.length) {
-      return res.status(404).json({ message: 'No student concept data found.' });
+      const DEFAULT_MASTERY = [
+        { concept: 'Arrays',        mastery: 72, abilityRating: 1276 },
+        { concept: 'Linked Lists',  mastery: 65, abilityRating: 1220 },
+        { concept: 'Binary Trees',  mastery: 58, abilityRating: 1164 },
+        { concept: 'BST',           mastery: 43, abilityRating: 1044 },
+        { concept: 'AVL',           mastery: 38, abilityRating: 1004 },
+        { concept: 'Graphs',        mastery: 55, abilityRating: 1140 },
+        { concept: 'BFS',           mastery: 60, abilityRating: 1180 },
+        { concept: 'Dijkstra',      mastery: 48, abilityRating: 1084 },
+      ];
+      await StudentConcept.insertMany(DEFAULT_MASTERY.map(c => ({ userId, ...c })));
+      concepts = await StudentConcept.find({ userId }).sort({ concept: 1 }).lean();
     }
 
     // Overall mastery = average across all concepts

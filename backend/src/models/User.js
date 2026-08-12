@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema(
       enum: ['student', 'admin'],
       default: 'student',
     },
+    hasCompletedDiagnostic: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
