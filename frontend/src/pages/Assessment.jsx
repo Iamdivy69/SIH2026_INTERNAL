@@ -145,85 +145,130 @@ function PreTestRules({ mode, concept, onConfirm, onCancel }) {
   const modeLabels = {
     diagnostic: {
       title: 'Diagnostic Baseline Assessment',
-      sub: '~10 questions round-robin across all 8 data structure concepts to set your starting knowledge profile.',
+      sub: '10 questions across all 8 data structure concepts to establish your starting knowledge profile.',
       badge: 'Diagnostic Baseline',
     },
     targeted: {
-      title: `Targeted Practice: ${concept || 'Selected Subject'}`,
-      sub: `~7 questions focused exclusively on ${concept || 'the selected subject'}.`,
+      title: `Targeted Practice: ${concept || 'Selected Topic'}`,
+      sub: `7 questions focused on ${concept || 'the selected topic'} to sharpen your understanding.`,
       badge: 'Targeted Practice',
     },
     adaptive: {
-      title: 'Adaptive Assessment Session',
-      sub: '~7 questions that dynamically adapt to your real-time Elo knowledge rating.',
+      title: 'Adaptive Proctored Assessment',
+      sub: '7 questions that dynamically adjust to your real-time knowledge level using Elo-based adaptive ranking.',
       badge: 'Adaptive Proctored',
     },
   };
 
   const info = modeLabels[mode] || modeLabels.adaptive;
 
+  const rules = [
+    {
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+        </svg>
+      ),
+      label: 'Full-Screen Lock',
+      desc: 'The assessment runs in proctored full-screen mode. Exiting full-screen is recorded as a violation.',
+      critical: false,
+    },
+    {
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+        </svg>
+      ),
+      label: 'Tab Switch & Window Focus',
+      desc: 'Switching browser tabs, opening other applications, or shifting window focus is strictly monitored.',
+      critical: false,
+    },
+    {
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      ),
+      label: 'Navigation Lock',
+      desc: 'Browser Back/Forward buttons and attempts to navigate away during the test count as violations.',
+      critical: false,
+    },
+    {
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      ),
+      label: 'Termination Penalty',
+      desc: 'Accumulating 6 violations will immediately terminate your assessment. No score or mastery progress will be saved.',
+      critical: true,
+    },
+  ];
+
   return (
-    <div className="max-w-xl mx-auto my-6 space-y-6">
-      <div className="card border-l-4 border-l-[#004CE5] space-y-6 p-6 sm:p-8">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#E6F0FF] dark:bg-[#0F1D3D] text-[#004CE5] flex items-center justify-center font-bold text-xl">
-              🛡️
-            </div>
-            <div>
-              <span className="chip chip-blue text-xs font-semibold">{info.badge}</span>
-              <h1 className="text-xl font-extrabold text-black dark:text-[#F3F4F6] mt-0.5">{info.title}</h1>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#010D26]/95 backdrop-blur-sm p-4">
+      <div className="w-full max-w-2xl">
+
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#004CE5]/15 border border-[#004CE5]/30 mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#004CE5] animate-pulse" />
+            <span className="text-xs font-semibold text-[#004CE5] uppercase tracking-widest">{info.badge}</span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">{info.title}</h1>
+          <p className="text-sm text-[#8BB8FF]/70 max-w-md mx-auto leading-relaxed">{info.sub}</p>
+        </div>
+
+        {/* Rules card */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b border-white/10 flex items-center gap-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8BB8FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span className="text-sm font-semibold text-[#8BB8FF] uppercase tracking-wider">Proctoring Rules & System Monitoring</span>
+          </div>
+
+          <div className="divide-y divide-white/5">
+            {rules.map((rule, i) => (
+              <div key={i} className="flex items-start gap-4 px-6 py-4">
+                <div className={`mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                  rule.critical
+                    ? 'bg-[#dc2626]/15 text-[#f87171]'
+                    : 'bg-[#004CE5]/15 text-[#8BB8FF]'
+                }`}>
+                  {rule.icon}
+                </div>
+                <div>
+                  <p className={`text-sm font-semibold mb-0.5 ${rule.critical ? 'text-[#f87171]' : 'text-white'}`}>
+                    {rule.label}
+                  </p>
+                  <p className="text-xs text-white/50 leading-relaxed">{rule.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <p className="text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
-          {info.sub}
-        </p>
-
-        <div className="p-4 rounded-xl bg-[#F8FAFF] dark:bg-[#0D1325] border border-[#E6F0FF] dark:border-[#1C2A4A] space-y-3">
-          <h2 className="text-sm font-bold text-[#011A53] dark:text-[#8BB8FF] flex items-center gap-2">
-            <span>📋</span> Proctoring Rules & System Monitoring
-          </h2>
-
-          <ul className="space-y-2.5 text-xs leading-relaxed text-black dark:text-[#F3F4F6]">
-            <li className="flex items-start gap-2">
-              <span className="text-[#004CE5] font-bold">•</span>
-              <span><strong>Full-Screen Lock:</strong> The assessment runs in proctored full-screen mode. Exiting full-screen mode is recorded as a violation.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#004CE5] font-bold">•</span>
-              <span><strong>Tab Switch & Window Focus:</strong> Switching browser tabs, opening other software, or shifting window focus is strictly monitored.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#004CE5] font-bold">•</span>
-              <span><strong>Navigation Lock:</strong> Clicking browser Back/Forward buttons or attempting to navigate to other pages during the test counts as a navigation violation.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[#dc2626] dark:text-[#f87171] font-bold">•</span>
-              <span><strong>Termination Penalty:</strong> Accumulating <strong>4 violations</strong> will immediately terminate your assessment with no score or mastery progress saved.</span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="pt-2 flex flex-col sm:flex-row gap-3">
+        {/* Action buttons */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={onConfirm}
-            className="btn-primary flex-1 font-bold text-sm py-3 text-center"
+            className="flex-1 py-3.5 px-6 rounded-xl bg-[#004CE5] hover:bg-[#0040C8] text-white text-sm font-bold tracking-wide transition-all duration-150 shadow-lg shadow-[#004CE5]/30"
           >
-            I Understand & Start Assessment &rarr;
+            I Understand — Start Assessment
           </button>
           <button
             onClick={onCancel}
-            className="btn-ghost text-xs px-4 py-2.5 text-[#64748B] dark:text-[#94A3B8] hover:text-black dark:hover:text-[#F3F4F6]"
+            className="px-6 py-3.5 rounded-xl border border-white/15 text-sm font-medium text-white/50 hover:text-white hover:border-white/30 transition-all duration-150"
           >
-            Cancel & Return
+            Cancel
           </button>
         </div>
       </div>
     </div>
   );
 }
+
 
 export default function Assessment() {
   const { authHeader, refreshUser, API } = useAuth();
