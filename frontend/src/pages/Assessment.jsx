@@ -452,12 +452,10 @@ export default function Assessment() {
       setQuestionsAnswered(data.questionsAnswered);
       if (data.totalQuestions) setTotalQuestions(data.totalQuestions);
 
-      if (data.done) {
+      if (data.done || data.questionsAnswered >= (data.totalQuestions || totalQuestions)) {
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
         }
-        setState('done');
-        return;
       }
 
       setState('revealing');
@@ -468,7 +466,13 @@ export default function Assessment() {
   };
 
   const handleNext = () => {
-    fetchNextQuestion();
+    if (questionsAnswered >= totalQuestions) {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      if (typeof refreshUser === 'function') refreshUser();
+      navigate('/dashboard');
+    } else {
+      fetchNextQuestion();
+    }
   };
 
   const handleDismissModal = () => {
@@ -656,13 +660,42 @@ export default function Assessment() {
               </button>
             )}
             {state === 'revealing' && (
-              <button
-                id="next-question"
-                onClick={handleNext}
-                className="btn-primary w-full"
-              >
-                {questionsAnswered >= totalQuestions ? 'View Results' : 'Next Question'}
-              </button>
+              <div className="space-y-3">
+                {questionsAnswered >= totalQuestions ? (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      id="return-dashboard"
+                      onClick={() => {
+                        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+                        if (typeof refreshUser === 'function') refreshUser();
+                        navigate('/dashboard');
+                      }}
+                      className="btn-primary flex-1 font-bold text-sm py-3 text-center"
+                    >
+                      Return to Dashboard &rarr;
+                    </button>
+                    <button
+                      id="view-results"
+                      onClick={() => {
+                        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+                        if (typeof refreshUser === 'function') refreshUser();
+                        navigate('/results', { state: { sessionId, mode } });
+                      }}
+                      className="btn-secondary flex-1 font-bold text-sm py-3 text-center"
+                    >
+                      View Detailed Profile
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    id="next-question"
+                    onClick={handleNext}
+                    className="btn-primary w-full"
+                  >
+                    Next Question &rarr;
+                  </button>
+                )}
+              </div>
             )}
           </div>
 

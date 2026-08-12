@@ -148,19 +148,16 @@ export default function Results() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Link to="/knowledge" className="btn-primary flex-1 text-center">
+        <Link to="/dashboard" className="btn-primary flex-1 text-center py-3 font-bold">
+          Return to Dashboard &rarr;
+        </Link>
+        <Link to="/knowledge" className="btn-secondary flex-1 text-center py-3">
           View Knowledge Profile
         </Link>
-        <Link to="/assessment" className="btn-secondary flex-1 text-center">
+        <Link to="/assessment" className="btn-secondary flex-1 text-center py-3">
           Take Another Assessment
         </Link>
       </div>
-
-      <p className="text-center text-sm text-[#64748B] dark:text-[#94A3B8]">
-        <Link to="/dashboard" className="text-[#011A53] dark:text-[#8BB8FF] hover:underline font-medium">
-          &larr; Back to Dashboard
-        </Link>
-      </p>
     </div>
   );
 }
