@@ -661,7 +661,7 @@ export default function Assessment() {
                 onClick={handleNext}
                 className="btn-primary w-full"
               >
-                {questionsAnswered >= TOTAL_QUESTIONS ? 'View Results' : 'Next Question'}
+                {questionsAnswered >= totalQuestions ? 'View Results' : 'Next Question'}
               </button>
             )}
           </div>
