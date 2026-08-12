@@ -94,9 +94,7 @@ export default function Signup() {
       <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[440px] space-y-8">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#004CE5] mb-2 shadow-md">
-              <span className="text-white text-xl font-bold">P</span>
-            </div>
+            <img src="/favicon.svg" alt="PARAKH AI Logo" className="w-14 h-14 rounded-2xl mx-auto mb-2 shadow-md" />
             <h1 className="text-[40px] font-extrabold text-black dark:text-[#F3F4F6]">Create your account</h1>
             <p className="text-base text-[#64748B] dark:text-[#94A3B8]">
               Start your adaptive learning journey

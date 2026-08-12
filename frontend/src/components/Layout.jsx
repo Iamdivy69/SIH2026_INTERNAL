@@ -50,11 +50,9 @@ export default function Layout({ children }) {
         <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#0F1525]/80 transition-colors duration-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between gap-4">
-              <NavLink to="/dashboard" className="flex items-center gap-2 shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-[#004CE5] flex items-center justify-center shadow-sm">
-                  <span className="text-white text-sm font-bold">P</span>
-                </div>
-                <span className="font-bold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
+              <NavLink to="/dashboard" className="flex items-center gap-2.5 shrink-0">
+                <img src="/favicon.svg" alt="PARAKH AI Logo" className="w-8 h-8 rounded-lg shadow-sm" />
+                <span className="font-extrabold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
               </NavLink>
 
               {user && (
