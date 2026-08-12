@@ -17,12 +17,19 @@ const MoonIcon = () => (
   </svg>
 );
 
-const navItems = [
+const studentNavItems = [
   { to: '/dashboard',      label: 'Dashboard' },
   { to: '/assessment',     label: 'Assessment' },
   { to: '/knowledge',      label: 'Knowledge' },
   { to: '/learning-path',  label: 'Learning Path' },
   { to: '/ai-tutor',       label: 'AI Tutor' },
+];
+
+const adminNavItems = [
+  { to: '/admin',           label: 'Overview' },
+  { to: '/admin/students',  label: 'Student Roster' },
+  { to: '/admin/questions', label: 'Question Bank' },
+  { to: '/admin/generator', label: 'AI Generator' },
 ];
 
 export default function Layout({ children }) {
@@ -32,6 +39,8 @@ export default function Layout({ children }) {
   const location = useLocation();
 
   const isAssessment = location.pathname === '/assessment';
+  const homePath = user?.role === 'admin' ? '/admin' : '/dashboard';
+  const activeNavItems = user?.role === 'admin' ? adminNavItems : studentNavItems;
 
   const handleLogout = () => {
     if (isAssessment) return;
@@ -50,17 +59,18 @@ export default function Layout({ children }) {
         <header className="sticky top-0 z-40 border-b border-[#E6F0FF] dark:border-[#1C2A4A] bg-white/95 dark:bg-[#0F1525]/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-[#0F1525]/80 transition-colors duration-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between gap-4">
-              <NavLink to="/dashboard" className="flex items-center gap-2.5 shrink-0">
+              <NavLink to={homePath} className="flex items-center gap-2.5 shrink-0">
                 <img src="/favicon.svg" alt="PARAKH AI Logo" className="w-8 h-8 rounded-lg shadow-sm" />
                 <span className="font-extrabold text-base text-black dark:text-[#F3F4F6] tracking-tight">PARAKH AI</span>
               </NavLink>
 
               {user && (
                 <nav className="hidden md:flex items-center gap-1">
-                  {navItems.map(({ to, label }) => (
+                  {activeNavItems.map(({ to, label }) => (
                     <NavLink
                       key={to}
                       to={to}
+                      end={to === '/admin'}
                       className={({ isActive }) =>
                         `nav-link ${isActive ? 'active' : ''}`
                       }
@@ -68,14 +78,6 @@ export default function Layout({ children }) {
                       {label}
                     </NavLink>
                   ))}
-                  {user.role === 'admin' && (
-                    <NavLink
-                      to="/admin"
-                      className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                    >
-                      Admin
-                    </NavLink>
-                  )}
                 </nav>
               )}
 

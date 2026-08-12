@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -12,6 +13,13 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = { id: decoded.id, role: decoded.role };
+
+    // Throttled lastActiveAt update (if > 5 minutes since last update)
+    const now = Date.now();
+    if (!req.user.lastActiveAt || now - new Date(req.user.lastActiveAt).getTime() > 5 * 60 * 1000) {
+      User.findByIdAndUpdate(decoded.id, { lastActiveAt: new Date(now) }).catch(() => {});
+    }
+
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token.' });

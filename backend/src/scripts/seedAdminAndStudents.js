@@ -98,6 +98,7 @@ async function seed() {
         passwordHash,
         role: u.role,
         hasCompletedDiagnostic: u.hasCompletedDiagnostic ?? true,
+        lastActiveAt: new Date(),
       });
 
       if (u.role === 'student') {

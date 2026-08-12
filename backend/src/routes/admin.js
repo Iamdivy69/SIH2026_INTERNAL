@@ -7,6 +7,11 @@ const StudentConcept = require('../models/StudentConcept');
 
 const groq = new Groq({ apiKey: process.env.LLM_API_KEY });
 
+const User = require('../models/User');
+const AssessmentSession = require('../models/AssessmentSession');
+const Response = require('../models/Response');
+const MasteryLog = require('../models/MasteryLog');
+
 // Role guard middleware
 function adminOnly(req, res, next) {
   if (req.user.role !== 'admin') {
@@ -14,6 +19,45 @@ function adminOnly(req, res, next) {
   }
   next();
 }
+
+// ── GET /api/admin/overview ────────────────────────────────────────
+router.get('/overview', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const totalStudents = await User.countDocuments({ role: 'student' });
+    const totalAssessments = await AssessmentSession.countDocuments({ status: 'completed' });
+    const questionBankSize = await Question.countDocuments({});
+
+    // Average institution mastery across all student concept records
+    const masteryAgg = await StudentConcept.aggregate([
+      { $group: { _id: null, avgMastery: { $avg: '$mastery' } } }
+    ]);
+    const avgInstitutionMastery = masteryAgg.length > 0 ? Math.round(masteryAgg[0].avgMastery) : 0;
+
+    // Violations logged in the last 7 days
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const sessionsWithViolations = await AssessmentSession.find({
+      'violations.timestamp': { $gte: sevenDaysAgo }
+    }).lean();
+
+    let violationsThisWeek = 0;
+    sessionsWithViolations.forEach(s => {
+      if (Array.isArray(s.violations)) {
+        violationsThisWeek += s.violations.filter(v => new Date(v.timestamp) >= sevenDaysAgo).length;
+      }
+    });
+
+    return res.json({
+      totalStudents,
+      totalAssessments,
+      avgInstitutionMastery,
+      questionBankSize,
+      violationsThisWeek,
+    });
+  } catch (err) {
+    console.error('GET /api/admin/overview error:', err);
+    return res.status(500).json({ message: 'Server error fetching admin overview.' });
+  }
+});
 
 // ── GET /api/admin/gaps ────────────────────────────────────────────
 // Real MongoDB aggregation — average mastery per concept across ALL students
@@ -44,6 +88,201 @@ router.get('/gaps', authMiddleware, adminOnly, async (req, res) => {
   } catch (err) {
     console.error('GET /api/admin/gaps error:', err);
     return res.status(500).json({ message: 'Server error fetching gaps.' });
+  }
+});
+
+// ── GET /api/admin/students ────────────────────────────────────────
+router.get('/students', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const { search, sort } = req.query;
+
+    // Search filter
+    const filter = { role: 'student' };
+    if (search) {
+      const regex = new RegExp(search, 'i');
+      filter.$or = [{ name: regex }, { email: regex }];
+    }
+
+    const students = await User.find(filter).lean();
+
+    // Enrich each student with aggregated metrics
+    const enriched = await Promise.all(
+      students.map(async (st) => {
+        const userId = st._id;
+
+        // Mastery avg
+        const concepts = await StudentConcept.find({ userId }).lean();
+        const overallMastery = concepts.length > 0
+          ? Math.round(concepts.reduce((sum, c) => sum + c.mastery, 0) / concepts.length)
+          : 0;
+
+        // Assessment sessions
+        const userSessions = await AssessmentSession.find({ userId }).lean();
+        const assessmentsCompleted = userSessions.filter(s => s.status === 'completed').length;
+        const totalViolations = userSessions.reduce((sum, s) => sum + (s.violationCount || 0), 0);
+
+        // Flagged: any session terminated OR any single session violationCount >= 3
+        const flagged = userSessions.some(s => s.status === 'terminated' || (s.violationCount && s.violationCount >= 3));
+
+        return {
+          id: st._id,
+          name: st.name,
+          email: st.email,
+          lastActiveAt: st.lastActiveAt || st.updatedAt || st.createdAt,
+          overallMastery,
+          assessmentsCompleted,
+          totalViolations,
+          flagged,
+        };
+      })
+    );
+
+    // Sort enriched results
+    const sortField = sort || 'lastActive';
+    enriched.sort((a, b) => {
+      if (sortField === 'mastery') return b.overallMastery - a.overallMastery;
+      if (sortField === 'violations') return b.totalViolations - a.totalViolations;
+      // Default: lastActive descending
+      return new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime();
+    });
+
+    return res.json({ students: enriched });
+  } catch (err) {
+    console.error('GET /api/admin/students error:', err);
+    return res.status(500).json({ message: 'Server error fetching student roster.' });
+  }
+});
+
+// ── GET /api/admin/students/:id ────────────────────────────────────
+router.get('/students/:id', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const student = await User.findById(studentId).lean();
+
+    if (!student || student.role !== 'student') {
+      return res.status(404).json({ message: 'Student not found.' });
+    }
+
+    // 1. Profile
+    const profile = {
+      id: student._id,
+      name: student.name,
+      email: student.email,
+      lastActiveAt: student.lastActiveAt || student.updatedAt || student.createdAt,
+      hasCompletedDiagnostic: student.hasCompletedDiagnostic || false,
+    };
+
+    // 2. Concepts (reusing exact state logic parameterized for studentId)
+    const concepts = await StudentConcept.find({ userId: studentId }).sort({ concept: 1 }).lean();
+    const enrichedConcepts = await Promise.all(
+      concepts.map(async (c) => {
+        const historyLogs = await MasteryLog.find({ userId: studentId, concept: c.concept })
+          .sort({ timestamp: 1 })
+          .limit(10)
+          .lean();
+
+        const history = historyLogs.map(l => ({
+          mastery: l.mastery,
+          delta: l.delta,
+          timestamp: l.timestamp,
+        }));
+
+        const responses = await Response.find({ userId: studentId, concept: c.concept })
+          .sort({ createdAt: -1 })
+          .lean();
+
+        const attemptCount = responses.length;
+        const correctCount = responses.filter(r => r.isCorrect).length;
+        const accuracy = attemptCount > 0 ? Math.round((correctCount / attemptCount) * 100) : 0;
+        const totalTime = responses.reduce((sum, r) => sum + (r.timeSpent || 0), 0);
+        const averageResponseTime = attemptCount > 0 ? Math.round(totalTime / attemptCount) : 0;
+        const recentAttempts = responses.slice(0, 5).map(r => r.isCorrect);
+
+        return {
+          ...c,
+          history,
+          attemptCount,
+          accuracy,
+          averageResponseTime,
+          recentAttempts,
+        };
+      })
+    );
+
+    // 3. Assessment History
+    const userSessions = await AssessmentSession.find({ userId: studentId }).sort({ createdAt: -1 }).lean();
+    const assessmentHistory = userSessions.map(s => ({
+      sessionId: s.sessionId,
+      mode: s.mode || 'adaptive',
+      concept: s.concept,
+      status: s.status,
+      startedAt: s.createdAt,
+      completedAt: s.updatedAt,
+      violationCount: s.violationCount || 0,
+      terminationReason: s.terminationReason,
+    }));
+
+    // 4. Violation Log (flattened, chronological desc)
+    const violationLog = [];
+    userSessions.forEach(s => {
+      if (Array.isArray(s.violations)) {
+        s.violations.forEach(v => {
+          violationLog.push({
+            type: v.type,
+            timestamp: v.timestamp,
+            sessionId: s.sessionId,
+          });
+        });
+      }
+    });
+    violationLog.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    return res.json({
+      profile,
+      concepts: enrichedConcepts,
+      assessmentHistory,
+      violationLog,
+    });
+  } catch (err) {
+    console.error(`GET /api/admin/students/${req.params.id} error:`, err);
+    return res.status(500).json({ message: 'Server error fetching student details.' });
+  }
+});
+
+// ── GET /api/admin/questions/health ───────────────────────────────
+router.get('/questions/health', authMiddleware, adminOnly, async (req, res) => {
+  try {
+    const CANONICAL_CONCEPTS = ['Arrays', 'Linked Lists', 'Binary Trees', 'BST', 'AVL', 'Graphs', 'BFS', 'Dijkstra'];
+
+    const health = await Promise.all(
+      CANONICAL_CONCEPTS.map(async (concept) => {
+        const questions = await Question.find({ concept }).lean();
+        const total = questions.length;
+
+        const easy = questions.filter(q => q.difficulty === 1).length;
+        const medium = questions.filter(q => q.difficulty === 2).length;
+        const hard = questions.filter(q => q.difficulty === 3).length;
+
+        const exposures = questions.map(q => q.timesServed || q.exposure || 0);
+        const min = exposures.length > 0 ? Math.min(...exposures) : 0;
+        const max = exposures.length > 0 ? Math.max(...exposures) : 0;
+        const avg = exposures.length > 0 ? Math.round((exposures.reduce((a, b) => a + b, 0) / exposures.length) * 10) / 10 : 0;
+        const neverServed = exposures.filter(e => e === 0).length;
+
+        return {
+          concept,
+          total,
+          byDifficulty: { easy, medium, hard },
+          exposure: { min, max, avg },
+          neverServed,
+        };
+      })
+    );
+
+    return res.json({ health });
+  } catch (err) {
+    console.error('GET /api/admin/questions/health error:', err);
+    return res.status(500).json({ message: 'Server error fetching question health.' });
   }
 });
 

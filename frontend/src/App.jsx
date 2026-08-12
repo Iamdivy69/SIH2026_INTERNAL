@@ -12,8 +12,12 @@ import Results      from './pages/Results';
 import Knowledge    from './pages/Knowledge';
 import LearningPath from './pages/LearningPath';
 import AiTutor      from './pages/AiTutor';
-import Admin        from './pages/Admin';
-import Landing      from './pages/Landing';
+import Admin              from './pages/Admin';
+import StudentRoster     from './pages/StudentRoster';
+import StudentDetail     from './pages/StudentDetail';
+import QuestionBankHealth from './pages/QuestionBankHealth';
+import AiGenerator        from './pages/AiGenerator';
+import Landing            from './pages/Landing';
 
 function App() {
   return (
@@ -57,6 +61,26 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute>
               <Layout><Admin /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/students" element={
+            <ProtectedRoute>
+              <Layout><StudentRoster /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/students/:id" element={
+            <ProtectedRoute>
+              <Layout><StudentDetail /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/questions" element={
+            <ProtectedRoute>
+              <Layout><QuestionBankHealth /></Layout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/generator" element={
+            <ProtectedRoute>
+              <Layout><AiGenerator /></Layout>
             </ProtectedRoute>
           } />
 

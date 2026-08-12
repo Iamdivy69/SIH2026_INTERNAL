@@ -40,5 +40,16 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
+  // Role separation guards
+  const studentRoutes = ['/dashboard', '/assessment', '/knowledge', '/learning-path', '/ai-tutor'];
+
+  if (user.role === 'admin' && studentRoutes.some(r => location.pathname === r || location.pathname.startsWith(`${r}/`))) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (user.role === 'student' && location.pathname.startsWith('/admin')) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 }
